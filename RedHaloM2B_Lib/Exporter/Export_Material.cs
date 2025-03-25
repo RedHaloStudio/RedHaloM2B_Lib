@@ -972,6 +972,79 @@ namespace RedHaloM2B
                 case "VRayCarPaintMtl2":
 
                     #region DIFFUSE
+                    maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 0);
+                    PBRMtl.DiffuseColor = RedHaloTools.IColorToString(maxClr, true);
+
+                    // Diffuse texture
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 41);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 42) == 1)
+                    {
+                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+                    #endregion
+
+                    #region SPECULAR / REFLECTION
+                    PBRMtl.Specular = RedHaloTools.GetValeByID<float>(material, 0, 2);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 44);
+                    if (texmap != null && RedHaloTools.GetValeByID<int>(material,0, 45) == 1)
+                    {
+                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    PBRMtl.SpecularRoughness = RedHaloTools.GetValeByID<float>(material, 0, 4);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 47);
+                    if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 48) == 1)
+                    {
+                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+                    #endregion
+
+                    #region COAT
+
+                    PBRMtl.Coat = RedHaloTools.GetValeByID<float>(material, 0, 28);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 68);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 69) == 1)
+                    {
+                        PBRMtl.CoatTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 26);
+                    PBRMtl.CoatTint = RedHaloTools.IColorToString(maxClr, true);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 65);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 66) == 1){
+                        PBRMtl.CoatTintTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    PBRMtl.CoatRoughness = RedHaloTools.GetValeByID<float>(material, 0, 32);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 74);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 75) == 1)
+                    {
+                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    PBRMtl.CoatIOR = RedHaloTools.GetValeByID<float>(material, 0, 30);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 71);
+                    if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 72) == 1)
+                    {
+                        PBRMtl.CoatIORTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    PBRMtl.CoatBump = RedHaloTools.GetValeByID<float>(material, 0, 79);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 77);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 78) == 1)
+                    {
+                        PBRMtl.CoatBumpTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    #endregion
+
+                    #region BUMP
+                    PBRMtl.Bump = RedHaloTools.GetValeByID<float>(material, 0, 55);
+                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 53);
+                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 54) == 1)
+                    {
+                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
 
                     #endregion
 

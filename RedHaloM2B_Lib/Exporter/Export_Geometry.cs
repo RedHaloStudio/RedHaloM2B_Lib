@@ -1,14 +1,5 @@
 ﻿using Autodesk.Max;
-using Autodesk.Max.Plugins;
 using RedHaloM2B.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace RedHaloM2B
 {
@@ -33,7 +24,8 @@ namespace RedHaloM2B
             // Set object name to new name
             maxNode.Name = newName;
 
-            RedHaloGeometry redHaloGeometry = new RedHaloGeometry {
+            RedHaloGeometry redHaloGeometry = new RedHaloGeometry
+            {
                 Name = newName,
                 OriginalName = originalName,
                 Transform = RedHaloTools.ConvertMatrixToString(tm),

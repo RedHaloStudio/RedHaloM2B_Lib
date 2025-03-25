@@ -19,10 +19,12 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;MAX2023</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,20 +37,28 @@
   <PropertyGroup>
     <ApplicationIcon>M2B Logo.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autodesk.Max">
+    <Reference Include="Autodesk.Max, Version=27.0.0.4918, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files\Autodesk\3ds Max 2023\Autodesk.Max.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\APP\DLL\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -59,13 +69,14 @@
     <Compile Include="Exporter\Export_Material.cs" />
     <Compile Include="Exporter\Export_Scene.cs" />
     <Compile Include="Exporter\Productor.cs" />
+    <Compile Include="Exporter\Scene - 复制.cs" />
     <Compile Include="Exporter\Scene.cs" />
     <Compile Include="Exporter\Settings.cs" />
     <Compile Include="Materials\BaseMtl.cs" />
     <Compile Include="Materials\DoubleMtl.cs" />
     <Compile Include="Materials\RedHaloPBRMtl.cs" />
     <Compile Include="Materials\StandardMtl.cs" />
-    <Compile Include="Materials\VrayLight.cs" />
+    <Compile Include="Materials\RedHaloLight.cs" />
     <Compile Include="Materials\VRayMtl.cs" />
     <Compile Include="Nodes\BaseNode.cs" />
     <Compile Include="Nodes\Camera.cs" />
@@ -79,16 +90,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Textures\BaseTex.cs" />
     <Compile Include="Textures\BitmapTex.cs" />
-    <Compile Include="Textures\BrickTex.cs" />
     <Compile Include="Textures\CheckerTex.cs" />
-    <Compile Include="Textures\ColorCorrectionTex.cs" />
-    <Compile Include="Textures\FalloffTex.cs" />
+    <Compile Include="Textures\ColorTex.cs" />
     <Compile Include="Textures\MixTex.cs" />
-    <Compile Include="Textures\Tex.cs" />
+    <Compile Include="Textures\TextureInfoB.cs" />
+    <Compile Include="Textures\TextureInfo.cs" />
     <Compile Include="Utils\AssetCallBack.cs" />
     <Compile Include="Utils\ClassID.cs" />
     <Compile Include="Utils\LightingConvert.cs" />
+    <Compile Include="Utils\MaterialUtils.cs" />
     <Compile Include="Utils\MathUtils.cs" />
+    <Compile Include="Utils\DictionaryEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="M2B Logo.ico" />
@@ -99,5 +111,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="ParamBlock2\PB2.xlsx" />
+    <None Include="post.bat" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>call "$(ProjectDir)post.bat" "$(TargetDir)" "$(ConfigurationName)" 2023</PostBuildEvent>
+  </PropertyGroup>
 </Project>

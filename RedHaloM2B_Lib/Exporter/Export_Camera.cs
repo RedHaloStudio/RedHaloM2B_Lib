@@ -9,6 +9,11 @@ namespace RedHaloM2B
     {
         public static RedHaloCamera ExportCamera(IINode camera, int cameraIndex)
         {
+            // 缓存一些常量，避免重复读取
+            var foreverTime = RedHaloCore.Forever;
+            var maxCameraState = RedHaloCore.Global.CameraState.Create();
+            var maxSensorWidth = RedHaloCore.Core.RendApertureWidth;
+
             float cFov = 35.0f;
             float cClippingNear = 0.1f;
             float cClippingFar = 20f;
@@ -16,39 +21,47 @@ namespace RedHaloM2B
             float cShiftY = 0.0f;
             float cSensorWidth = 36.0f;
 
+            // 相机名称设置
             string cameraSourceName = camera.Name;
             string cameraName = $"Camera_{cameraIndex:D5}";
-            //string cid = Guid.NewGuid().ToString();            
-            
-            // Set New Name
             camera.Name = cameraName;
 
-            /// For Max Camera
+            // 创建 Max 相机和相机状态对象
             var maxCamera = camera.ObjectRef.FindBaseObject() as ICameraObject;
-            var maxCameraState = RedHaloCore.Global.CameraState.Create();
-            maxCamera.EvalCameraState(0, RedHaloCore.Forever, maxCameraState);
+            maxCamera?.EvalCameraState(0, foreverTime, maxCameraState);
 
-            bool hasPB2 = true;
+            // 如果相机获取出错，返回null
+            //if (maxCamera == null) return null;
+
+            // 获取 ParamBlock2，如果没有则设置 flag
             IIParamBlock2 camParamBlock = null;
-            try
-            {
-                camParamBlock = maxCamera.SubAnim(0) as IIParamBlock2;
-            }
-            catch (Exception)
-            {
-                hasPB2 = false;
-            }
+            bool hasPB2 = TryGetParamBlock(maxCamera, out camParamBlock);
 
-            var maxSensorWidth = RedHaloCore.Core.RendApertureWidth;
+            // Helper Method: 获取 ParamBlock2
+            bool TryGetParamBlock(ICameraObject maxCamera, out IIParamBlock2 paramBlock)
+            {
+                paramBlock = null;
+                try
+                {
+                    paramBlock = maxCamera?.SubAnim(0) as IIParamBlock2;
+                    return paramBlock != null;
+                }
+                catch (Exception ex)
+                {
+                    Debug.Print($"Error retrieving SubAnim(0): {ex.Message}");
+                    return false;
+                }
+            }
+            // 获取相机矩阵
+            var cameraMatrix = camera.GetObjectTM(0, foreverTime);
 
-            RedHaloCamera redHaloCamera = new()
+            // 创建 RedHaloCamera 对象
+            RedHaloCamera redHaloCamera = new RedHaloCamera
             {
                 Name = cameraName,
-                OriginalName = cameraSourceName
+                OriginalName = cameraSourceName,
+                Transform = RedHaloTools.ConvertMatrixToString(cameraMatrix),
             };
-
-            var cameraMatrix = camera.GetObjectTM(0, RedHaloCore.Forever);
-            redHaloCamera.Transform = RedHaloTools.ConvertMatrixToString(cameraMatrix);
 
             switch (maxCamera.ClassID.PartA)
             {

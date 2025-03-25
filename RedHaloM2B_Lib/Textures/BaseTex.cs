@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RedHaloM2B.Textures
+﻿namespace RedHaloM2B.Textures
 {
     public class BaseTex
     {
-        public string Name {  get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
 
-        public BaseTex(){ }
+        public BaseTex() { }
     }
 }

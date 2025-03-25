@@ -1,15 +1,10 @@
 ﻿using Autodesk.Max;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RedHaloM2B.Nodes;
+using System;
 
 namespace RedHaloM2B
 {
-	partial class Exporter
+    partial class Exporter
     {
         public static RedHaloLight ExportLights(IINode light, int lightIndex)
         {
@@ -180,7 +175,7 @@ namespace RedHaloM2B
                     {
                         float kv = 2500.0f;
                         lightPB.GetValue(lightPB.IndextoID(29), 0, ref kv, RedHaloCore.Forever, 0);
-                        var clr = RedHaloTools.GetRgbFromKelvin(kv);                        
+                        var clr = RedHaloTools.GetRgbFromKelvin(kv);
                         _diffuseColor = $"{clr.R},{clr.G},{clr.B},1";
                     }
                     #endregion
@@ -409,7 +404,7 @@ namespace RedHaloM2B
                 // "Omnilight"
                 case 0x00001011:
                     #region Color
-                    
+
                     maxColor = maxLight.GetRGBColor(0, RedHaloCore.Forever);
                     _diffuseColor = $"{maxColor.X},{maxColor.Y},{maxColor.Z},1";
                     #endregion
@@ -518,7 +513,7 @@ namespace RedHaloM2B
 
                     //Kelvin Color
                     lightPB.GetValue(lightPB.IndextoID(7), 0, ref kelvin, RedHaloCore.Forever, 0);
-                    var kelvinClr = RedHaloTools.GetRgbFromKelvin((double)kelvin);
+                    var kelvinClr = RedHaloTools.GetRgbFromKelvin(kelvin);
 
                     // lightPB.GetValue(lightPB.IndextoID(3), 0, filterColor, RedHaloCore.Forever, 0);
                     filterColor = useKelvin != 1 ? filterColor : kelvinClr;

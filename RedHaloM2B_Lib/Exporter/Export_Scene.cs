@@ -25,9 +25,9 @@ namespace RedHaloM2B
             // RH_M2B_TEMP/RHM2B_material.xml (材质参数，最终会上面文件合并,暂时方案)
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
-            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_CONTENT.xml");            
+            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_CONTENT.xml");
             string logFilename = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RHM2B_log.log");
-            
+
             // 尝试删除log文件
             File.Delete(logFilename);
 
@@ -35,19 +35,18 @@ namespace RedHaloM2B
             HashSet<string> nodeKeys = new HashSet<string>();
 
             IINodeTab tabs = RedHaloCore.Global.INodeTab.Create();
-            
+
             var dirInfo = RedHaloTools.CreateTempFolder(tempOutDirectory);
             if (dirInfo != 0)
             {
                 RedHaloTools.WriteLog($"创建临时文件夹失败，检查一下文件写入权限");
                 return 1;
             }
-            Directory.CreateDirectory(Path.Combine(tempOutDirectory, "Textures"));                     
+            Directory.CreateDirectory(Path.Combine(tempOutDirectory, "Textures"));
 
             int startFrame = RedHaloCore.Core.AnimRange.Start / RedHaloCore.Global.TicksPerFrame;
             int endFrame = RedHaloCore.Core.AnimRange.End / RedHaloCore.Global.TicksPerFrame;
 
-            
             RedHaloTools.WriteLog($"文件 ：{RedHaloCore.Core.CurFilePath}");
 
             #endregion
@@ -98,8 +97,8 @@ namespace RedHaloM2B
             #endregion
 
             #region SETTINGS
-            
-            RedHaloTools.WriteLog("开始设置文件写入");            
+
+            RedHaloTools.WriteLog("开始设置文件写入");
 
             redhaloScene.Settings = new RedHaloSettings
             {
@@ -110,26 +109,39 @@ namespace RedHaloM2B
                 AnimateStart = startFrame,
                 AnimateEnd = endFrame,
                 FrameRate = 4800 / RedHaloCore.Global.TicksPerFrame, // There are always 4800 ticks per second, this means that ticksPerFrame is dependent on the frames per second rate (ticksPerFrame * frameRate == 4800)
+
+#if MAX2022 || MAX2023
                 Gamma = RedHaloCore.Global.GammaMgr.DispGamma,
+#elif MAX2024 || MAX2025
+                Gamma = RedHaloCore.Global.GammaMgr.DisplayGamma,
+#else
+                Gamma = 1.0f,
+#endif
+
                 LinearWorkflow = 0,
                 ExportFormat = fileFormat
             };
 
             RedHaloTools.WriteLog("设置文件写入完成");
-            
+
             #endregion
 
+            var sceneNodes = RedHaloTools.GetSceneNodes();
+
             #region EXPORT NODES
-            IEnumerable<IINode> staticMesh = RedHaloTools.GetSceneNodes().
-                Where(o => 
-                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Geomobject || 
-                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Shape ||
-                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Helper
-            );
-            
+
+            IEnumerable<IINode> staticMesh = sceneNodes.Where(o =>
+            {
+                var ob = o.ObjectRef.FindBaseObject();
+                return ob.SuperClassID == SClass_ID.Geomobject ||
+                ob.SuperClassID == SClass_ID.Shape ||
+                ob.SuperClassID == SClass_ID.Helper;
+            });
+
             foreach (var node in staticMesh)
             {
-                if (nodeKeys.Contains(node.Name)) {
+                if (nodeKeys.Contains(node.Name))
+                {
                     continue;
                 }
                 else
@@ -145,9 +157,9 @@ namespace RedHaloM2B
                     }
 
                     string baseobj = $"Mesh_{index:D5}"; //tabs[0].Name;
-                    
+
                     for (int i = 0; i < tabs.Count; i++)
-                    {                        
+                    {
                         var nd = tabs[i];
 
                         try
@@ -174,16 +186,16 @@ namespace RedHaloM2B
             index = 0;
             nodeKeys.Clear();
             #endregion
-            
+
             #region EXPORT CAMERAS
             // 场景中所有相机物体
-            var cameraNodes = RedHaloTools.GetSceneNodes().Where(obj => obj.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Camera);
+            var cameraNodes = sceneNodes.Where(obj => obj.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Camera);
             RedHaloCamera redHaloCamera = new();
 
             foreach (var cam in cameraNodes)
             {
                 redHaloCamera = Exporter.ExportCamera(cam, index);
-                redhaloScene.cameras.Add(redHaloCamera);
+                redhaloScene.Cameras.Add(redHaloCamera);
                 index++;
             }
 
@@ -191,14 +203,14 @@ namespace RedHaloM2B
             nodeKeys.Clear();
 
             RedHaloTools.WriteLog($"共导出 {cameraNodes.Count()} 个相机");
-            
+
             #endregion
 
             #region EXPORT LIGHTS
 
             // 场景中所有灯光物体
-            var lightNodes = RedHaloTools.GetSceneNodes().Where(obj => obj.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Light);
-            
+            var lightNodes = sceneNodes.Where(obj => obj.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Light);
+
             foreach (var light in lightNodes)
             {
                 //Debug.Print(light.Name);
@@ -225,18 +237,18 @@ namespace RedHaloM2B
                         catch (Exception e)
                         {
                             Debug.Print(e.ToString());
-                        }                        
-                        
+                        }
+
                         nodeKeys.Add(tabs[i].Name);
                         index++;
-                    }                    
+                    }
                 }
             }
             index = 0;
             nodeKeys.Clear();
 
             RedHaloTools.WriteLog($"共导出 {lightNodes.Count()} 个灯光");
-            
+
             #endregion
 
             #region WRITE XML FILE

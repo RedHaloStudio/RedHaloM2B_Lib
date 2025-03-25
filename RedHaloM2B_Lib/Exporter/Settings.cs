@@ -10,7 +10,7 @@ namespace RedHaloM2B
 
         [XmlElement("image_width")]
         public int ImageWidth { get; set; }
-        
+
         [XmlElement("image_height")]
         public int ImageHeight { get; set; }
 

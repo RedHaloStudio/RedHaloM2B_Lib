@@ -1,9 +1,6 @@
-﻿using RedHaloM2B.Nodes;
-using System;
+﻿using RedHaloM2B.Materials;
+using RedHaloM2B.Nodes;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace RedHaloM2B
@@ -13,8 +10,8 @@ namespace RedHaloM2B
     {
         // Producter
         [XmlElement("productor")]
-        public RedHaloProductor Productor {  get; set; }
-        
+        public RedHaloProductor Productor { get; set; }
+
         // Settings
         [XmlElement("settings")]
         public RedHaloSettings Settings { get; set; }
@@ -30,20 +27,32 @@ namespace RedHaloM2B
         // Lights
         [XmlArray("lights")]
         [XmlArrayItem("light")]
-        public List<RedHaloLight> LightsList { get; set; }
+        public List<Nodes.RedHaloLight> LightsList { get; set; }
 
         // Cameras
         [XmlArray("cameras")]
-        public List<RedHaloCamera> cameras { get; set; }        
+        public List<RedHaloCamera> Cameras { get; set; }
 
-        public RedHaloScene() { }        
+        // Materials
+        [XmlArray("materials")]
+        public List<RedHaloPBRMtl> Materials { get; set; }
+
+        public RedHaloScene()
+        {
+            GeometryList = [];
+            LightsList = [];
+            Cameras = [];
+            Materials = [];
+        }
+
         public RedHaloScene(string output)
         {
             //OutputFiles = output;
-            GeometryList = new List<RedHaloGeometry>();
-            LightsList = new List<RedHaloLight>();
-            cameras = new List<RedHaloCamera>();
+            GeometryList = [];
+            LightsList = [];
+            Cameras = [];
+            Materials = [];
         }
-        
+
     }
 }

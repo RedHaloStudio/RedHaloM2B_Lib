@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace RedHaloM2B
 {
@@ -11,12 +6,12 @@ namespace RedHaloM2B
     {
         //[XmlAttribute("id")]
         //public string ID { get; set; }
-        
+
         [XmlAttribute("name")]
         public string Name { get; set; }
 
         [XmlAttribute("original_name")]
-        public string OriginalName {  get; set; }
+        public string OriginalName { get; set; }
 
         //[XmlAttribute("parentid")]
         //public string ParentId {  get; set; }
@@ -25,10 +20,10 @@ namespace RedHaloM2B
         public string BaseObject { get; set; }
 
         [XmlAttribute("transform")]
-        public string Transform {  get; set; }
-        
+        public string Transform { get; set; }
+
         [XmlAttribute("pivotoffset")]
-        public string PivotOffset {  get; set; }
-        
+        public string PivotOffset { get; set; }
+
     }
 }

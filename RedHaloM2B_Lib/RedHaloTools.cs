@@ -1,5 +1,8 @@
 ﻿using Autodesk.Max;
+using Newtonsoft.Json;
+using RedHaloM2B.Materials;
 using RedHaloM2B.Textures;
+using RedHaloM2B.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -47,7 +50,7 @@ namespace RedHaloM2B
                     return -2;
                 }
             }
-            
+
             try
             {
                 Directory.CreateDirectory(path);
@@ -68,7 +71,7 @@ namespace RedHaloM2B
             byte[] hashBytes = md5.ComputeHash(inputBytes);
             return BitConverter.ToString(hashBytes).Replace("-", "");
         }
-        
+
         // Calc MD5 From File
         public static string CalcMD5FromFile(string path)
         {
@@ -79,10 +82,11 @@ namespace RedHaloM2B
                 byte[] hashBytes = md5.ComputeHash(file);
                 file.Close();
 
-                return BitConverter.ToString(hashBytes).Replace("-","");
+                return BitConverter.ToString(hashBytes).Replace("-", "");
             }
-            else { 
-                return string.Empty; 
+            else
+            {
+                return string.Empty;
             }
         }
 
@@ -117,7 +121,7 @@ namespace RedHaloM2B
             foreach (var node in maxNodeScene)
             {
                 string _tmp = RedHaloTools.FixSafeName(node.Name);
-                node.Name = _tmp;                
+                node.Name = _tmp;
 
                 if (nodeNames.Contains(_tmp))
                 {
@@ -161,7 +165,7 @@ namespace RedHaloM2B
                 }
             }
         }
-    
+
         // Get All Files
         public static void GetAllFiles(string path, bool subfolder)
         {
@@ -196,17 +200,17 @@ namespace RedHaloM2B
         // Convert Shape to Poly
         public static void ConvertShapeToPoly()
         {
-            //IEnumerable<IINode> iNodes = GetSceneNodes().Where(o => o.ObjectRef.SuperClassID == SClass_ID.Shape);
             IEnumerable<IINode> iNodes = GetSceneNodes().Where(o => o.ObjectRef.IsShapeObject == true);
 
             var tab = RedHaloCore.Global.INodeTab.Create();
 
-            foreach (var iNode in iNodes) {
+            foreach (var iNode in iNodes)
+            {
                 IShapeObject shp = iNode.ObjectRef as IShapeObject;
-                
-                if(shp == null)
+
+                if (shp == null)
                 {
-                   continue;
+                    continue;
                 }
 
                 if (shp.Renderable)
@@ -219,23 +223,10 @@ namespace RedHaloM2B
                     var rs = AddModifier(iNode.Handle, editpolyMod);
 
                     //if (obj.CanConvertToType(RedHaloCore.Global.PolyObjectClassID) == 1)
-                    {                        
+                    {
                         //var oo = obj.ConvertToType(RedHaloCore.Core.Time, RedHaloCore.Global.TriObjectClassID);
                     }
                 }
-            }
-        }
-
-        // Delete 0 faces object
-        public static void DeleteEmptyObject()
-        {
-            IEnumerable<IINode> iNodes = GetSceneNodes();//.Where(o => o.ObjectRef.SuperClassID == SClass_ID.Geomobject);
-
-            foreach (var iNode in iNodes)
-            {
-                var obj = iNode as IIGameNode;
-                
-                //Debug.Print($"{iNode.Name} has {obj.Name} faces");
             }
         }
 
@@ -246,7 +237,8 @@ namespace RedHaloM2B
         }
 
         // 清理用户属性，blender不支持fbx用户属性
-        public static void RemoveUserProperties() { 
+        public static void RemoveUserProperties()
+        {
 
         }
 
@@ -272,7 +264,7 @@ namespace RedHaloM2B
         /// </summary>
         /// <param name="temperature"></param>
         /// <returns></returns>
-        public static /*string*/ IColor GetRgbFromKelvin(double temperature)
+        public static /*string*/ IColor GetRgbFromKelvin(float temperature)
         {
 
             // Temperature must fit between 1000 and 40000 degrees.
@@ -362,8 +354,9 @@ namespace RedHaloM2B
                 for (int d = 0; d < pb2.NumParams; d++)
                 {
                     var pid = pb2.IndextoID(d);
-                    var def = pb2.GetParamDef(pid);
-                    Debug.WriteLine($"{p}-{d},\t{def.Type},\t{def.IntName}");
+                    var def = pb2.GetParamDef(pid);                  
+
+                    Debug.WriteLine($"{p}\t{d}\t{def.Type}\t{def.IntName}");
                 }
             }
         }
@@ -371,24 +364,23 @@ namespace RedHaloM2B
         /// <summary>
         /// Get All Params Name
         /// </summary>
-        /// <param name="mtl"></param>
-        public static void GetParams(ITexmap mtl)
+        /// <param name="tex"></param>
+        public static void GetParams(ITexmap tex)
         {
-            for (int p = 0; p < mtl.NumParamBlocks; p++)
+            for (int p = 0; p < tex.NumParamBlocks; p++)
             {
-                var pb2 = mtl.GetParamBlock(p);
+                var pb2 = tex.GetParamBlock(p);
                 for (int d = 0; d < pb2.NumParams; d++)
                 {
                     var pid = pb2.IndextoID(d);
                     var def = pb2.GetParamDef(pid);
-                    Debug.WriteLine($"{p}-{d},\t{def.Type},\t{def.IntName}");                    
+                    Debug.WriteLine($"{p}-{d}\t{def.Type}\t{def.IntName}");
                 }
             }
         }
 
         // 速度快，但是不一定能保证取得的数据是正确的，除非不会修改PB2的ID值
         public static T GetValeByID<T>(IMtl mtl, short paramBlockID, int paramID)
-        //public static T GetValeByID<T, U>(U typeU, short paramBlockID, int paramID)
         {
             Type type = typeof(T);
 
@@ -419,8 +411,12 @@ namespace RedHaloM2B
             if (type == typeof(ITexmap))
             {
                 ITexmap result = pb2.GetTexmap(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
+                return (T)(Object)result;
+            }
 
-                Debug.WriteLine($"Texmap type is : {result.ClassName(false)} ");
+            if (type == typeof(IMtl))
+            {
+                var result = pb2.GetMtl(pb2.IndextoID(paramID), 0, 0);
                 return (T)(Object)result;
             }
 
@@ -431,7 +427,7 @@ namespace RedHaloM2B
         {
             Type type = typeof(T);
 
-            var pb2 = tex.GetParamBlock(paramBlockID);            
+            var pb2 = tex.GetParamBlock(paramBlockID);
 
             if (type == typeof(float))
             {
@@ -443,6 +439,13 @@ namespace RedHaloM2B
             if (type == typeof(IColor))
             {
                 var result = RedHaloCore.Global.Color.Create(0, 0, 0);
+                pb2.GetValue(pb2.IndextoID(paramID), 0, result, RedHaloCore.Forever, 0);
+                return (T)(Object)result;
+            }
+            
+            if (type == typeof(IAColor))
+            {
+                var result = RedHaloCore.Global.AColor.Create(0, 0, 0, 1);
                 pb2.GetValue(pb2.IndextoID(paramID), 0, result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
@@ -475,6 +478,12 @@ namespace RedHaloM2B
             if (type == typeof(IReferenceTarget))
             {
                 var result = pb2.GetReferenceTarget(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
+                return (T)(Object)result;
+            }
+
+            if (type == typeof(IIParamBlock2))
+            {
+                var result = pb2.GetParamBlock2(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
 
@@ -598,8 +607,8 @@ namespace RedHaloM2B
         {
             IMtlBaseLib sceneMtl = RedHaloCore.Core.SceneMtls;
 
-            List<IMtl> materials = new List<IMtl>();            
-            
+            List<IMtl> materials = new List<IMtl>();
+
             for (int i = 0; i < sceneMtl.Count; i++)
             {
                 var mtl = sceneMtl[i];
@@ -616,40 +625,23 @@ namespace RedHaloM2B
             }
 
             // 清除重复的材质并修复名字
-            List<IMtl> newMtls = new List<IMtl>();
             List<IMtl> uniqueMaterials = new List<IMtl>();
             HashSet<IMtl> materialSet = new HashSet<IMtl>();
-           
+
             foreach (var mtl in materials)
             {
                 // 修复材质名字
                 mtl.Name = RedHaloTools.FixSafeName(mtl.Name);
 
-                if ( materialSet.Add(mtl))
+                if (materialSet.Add(mtl))
                 {
                     uniqueMaterials.Add(mtl);
                 }
-
-                if (materialSet.Contains(mtl))
-                {
-                    continue;
-                }
-                else
-                {
-                    newMtls.Add(mtl);
-                    materialSet.Add(mtl);
-                }
             }
-
-            // Make material name unique
-            var dupName = newMtls
-                .GroupBy(n => n.Name)
-                .Where(g => g.Count() > 1)
-                .SelectMany(g => g);
 
             Dictionary<string, int> nameCounts = new Dictionary<string, int>();
 
-            foreach (var m in dupName)
+            foreach (var m in uniqueMaterials)
             {
                 // 如果名字已经存在，计数器加1
                 if (nameCounts.ContainsKey(m.Name))
@@ -657,36 +649,32 @@ namespace RedHaloM2B
                     nameCounts[m.Name]++;
                     m.Name = $"{m.Name}_{nameCounts[m.Name]}";
                 }
-                else {
+                else
+                {
                     nameCounts[m.Name] = 0;
                 }
-            }
-
-            foreach (var item in newMtls)
-            {
-                //Debug.Print($"{item.Name} / {item.GetType().Name}");
             }
         }
 
         // 使用递归方法取得材质的子材质
         public static IEnumerable<IMtl> GetSceneMtlRecure(IMtl mtl)
         {
-            for (int i = 0;i < mtl.NumSubMtls; i++)
+            for (int i = 0; i < mtl.NumSubMtls; i++)
             {
                 IMtl childMtl = mtl.GetSubMtl(i);
 
-                if (childMtl != null) {
+                if (childMtl != null)
+                {
                     yield return childMtl;
 
-                    foreach(var chm in GetSceneMtlRecure(childMtl))
+                    foreach (var chm in GetSceneMtlRecure(childMtl))
                     {
                         yield return chm;
                     }
-                
+
                 }
             }
         }
-
 
         // 整理纹理路径
         public static void CollectTextures()
@@ -694,7 +682,7 @@ namespace RedHaloM2B
             //Autodesk.Max.IInterface.EnumAuxFiles(Autodesk.Max.IAssetEnumCallback, uint)
             //AssetEnumCallBackExample callBackExample = new AssetEnumCallBackExample();
             var ast = RedHaloCore.Global.MaxSDK.AssetManagement.IAssetManager.Instance;
-            
+
         }
 
         // Rescale whole scene
@@ -704,7 +692,13 @@ namespace RedHaloM2B
 
             if (fac != 1f)
             {
+#if MAX2022 || MAX2023 || MAX2024
                 RedHaloCore.Core.RescaleWorldUnits(fac, false);
+#elif MAX2025
+                IINodeTab iNodeTab = RedHaloCore.Global.INodeTab.Create();
+                RedHaloCore.Core.RescaleWorldUnits(fac, false, iNodeTab);
+#endif
+
                 RedHaloCore.Global.SetSystemUnitInfo(5, 1);
             }
         }
@@ -714,8 +708,6 @@ namespace RedHaloM2B
         {
             foreach (var obj in RedHaloTools.GetSceneNodes())
             {
-                //string propstr = "";
-                //obj.GetUserPropBuffer(ref propstr);
                 obj.SetUserPropBuffer("");
             }
         }
@@ -724,9 +716,19 @@ namespace RedHaloM2B
         public static void CleanUnsupportObjects()
         {
             var objs = RedHaloTools.GetSceneNodes()
-                .Where(o => o.ObjectRef.ClassID.OperatorEquals(RHClassID.cidVRayPlane) || 
-                            o.ObjectRef.ClassID.OperatorEquals(RHClassID.cidChaosScatter) ||
-                            o.ObjectRef.ClassID.OperatorEquals(RHClassID.cidLinkComposite));
+                .Where(o =>
+                {
+                    var ob = o.ObjectRef.ClassID;
+#if MAX2022
+                    return ob.PartA.Equals(RHClassID.cidVRayPlane.PartA) ||
+                           ob.PartA.Equals(RHClassID.cidChaosScatter.PartA) ||
+                           ob.PartA.Equals(RHClassID.cidLinkComposite.PartA);
+#else
+                    return ob.OperatorEquals(RHClassID.cidVRayPlane) ||
+                           ob.OperatorEquals(RHClassID.cidChaosScatter) ||
+                           ob.OperatorEquals(RHClassID.cidLinkComposite);
+#endif
+                }).ToList(); ;
 
             foreach (var obj in objs)
             {
@@ -738,14 +740,20 @@ namespace RedHaloM2B
         public static void removeProxyModifier()
         {
             var objs = RedHaloTools.GetSceneNodes()
-                .Where(o => o.ObjectRef.ClassID.OperatorEquals(RHClassID.cidVRayProxy) ||
-                            o.ObjectRef.ClassID.OperatorEquals(RHClassID.cidCoronaProxy));
-            
+                .Where(o =>
+                {
+                    var ob = o.ObjectRef.ClassID;
+#if MAX2022
+                    return ob.PartA.Equals(RHClassID.cidVRayProxy.PartA) ||
+                           ob.PartA.Equals(RHClassID.cidCoronaProxy.PartA);
+#else
+                    return ob.OperatorEquals(RHClassID.cidVRayProxy) ||
+                           ob.OperatorEquals(RHClassID.cidCoronaProxy);
+#endif
+                }).ToList();
+
             foreach (var obj in objs)
             {
-                //var aa = (ITriObject)obj;
-                //var ccc = aa.Mesh.NumFaces;
-
                 var dobj = obj.ObjectRef as IIDerivedObject;
                 if (dobj != null)
                 {
@@ -763,7 +771,7 @@ namespace RedHaloM2B
         {
             var objs = GetSceneNodes().Where(
                 o =>
-                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Geomobject                
+                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Geomobject
             );
             var time = RedHaloCore.Core.Time;
             var objList = new List<IINode>();
@@ -784,7 +792,7 @@ namespace RedHaloM2B
             }
 
             RedHaloCore.Core.DeleteNodes(iNodeTab, true, true, true);
-        }        
+        }
 
         public static IBitmap CreateBitmap(ITexmap tex, ushort width, ushort height, string filename)
         {
@@ -828,7 +836,7 @@ namespace RedHaloM2B
                     0-7,	Reftarg,	coords
                     */
                     Debug.Print("++++ CHECKER ++++");
-                    
+
 
                     break;
                 case "Color Correction":
@@ -869,10 +877,10 @@ namespace RedHaloM2B
                     }
                     break;
                 case "Falloff":
-                    
+
                     break;
                 case "Gradient":
-                    
+
                     break;
                 case "Gradient Ramp":
 
@@ -1087,7 +1095,7 @@ namespace RedHaloM2B
                 case "CoronaWire":
                     break;
                 #endregion
-                
+
                 default:
                     break;
             }
@@ -1119,7 +1127,7 @@ namespace RedHaloM2B
                     0-8,	Bool2,	force1SidedSubMtls
                     0-9,	Bool2,	mult_by_front_diffuse 
                     */
-                    var frontMtl = GetValeByID<IMtl>(mtl, 0, 0);                    
+                    var frontMtl = GetValeByID<IMtl>(mtl, 0, 0);
 
                     break;
                 case "VRayOverrideMtl":
@@ -1142,61 +1150,79 @@ namespace RedHaloM2B
             }
         }
 
-        public static void Test1()
+        public static void Test()
         {
-            Debug.Print("OKK");
-            //GetParams(mtl);
+            var mats = MaterialUtils.GetSceneMaterials().ToList();
+            var mtl = mats.Where(ob => ob.Name == "Mat3d66_15228128_1_16716").First();
             //CleanupMtl(mtl);
+            //RedHaloPBRMtl PBRMtl = new()
+            //{
+            //    Name = mtl.Name,
+            //    SourceName = mtl.Name,
+            //    MaterialType = mtl.ClassName(false),
+            //};
 
+            //IColor maxClr = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
+            //Debug.Print($"{tex.Name} / {tex.ClassName(false)}");
+
+            // 获取材质
             // Diffuse Texmap [VRayMtl]
             //var tex = GetValeByID<ITexmap>(mtl, 0, 67);
+            //GetParams(tex);
 
-            //var tt = RemoveUnsupportTexmap<ITexmap>(tex);
-            //var tt = GetValeByID<ITexmap>(tex, 0, 0);
+            //var ti = new TexmapInfo();
+            // 如果材质类型不为空，进入循环
+            //if (tex != null)
+            //{
+            //ti = MaterialUtils.GetTexmap(tex);
+            //}
+            var mtlpbr = Exporter.ExportMaterial(mtl, 0);
 
-            //var pb2 = tex.GetParamBlock(0);
-            //var aaaa = pb2.GetTexmap(pb2.IndextoID(0), 0, 0);
+            string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
+            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
 
-            //SetValueByID<ITexmap>(mtl, 0, 67, null);
+            string json = JsonConvert.SerializeObject(mtlpbr, Formatting.Indented);
 
-            //Debug.Print(tex.ClassName(false));
-            // var t1 = tex.GetSubTexmap(0);
-            //Debug.Print($"{t1.ClassName(false)}");
-            // 最顶层
-            //ProcessTex(tex);
+            // 使用 JsonTextWriter 将 JSON 写入文件
+            using (StreamWriter file = File.CreateText(outputFileName))
+            using (JsonTextWriter writer = new JsonTextWriter(file))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(writer, mtlpbr);                
+            }
         }
 
-        /// <summary>
-        /// Adds an object space modifier to provided node (by handle).
-        /// </summary>
-        /// <param name="nodeHandle"> Input the node handle to add the modifier to. </param>
-        /// <param name="cid"> Input the class id of the modifier add. </param>
-        /// <returns> Returns 1 if successful or -1 if not. </returns>
-        static public int AddOsmModifier(uint nodeHandle, IClass_ID cid)
+        public static void ExportMtl()
         {
-            try
+            var b = MaterialUtils.GetSceneMaterials();
+
+            string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
+            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL.xml");
+
+            RedHaloScene redhaloScene = new(tempOutDirectory);
+
+            var index = 0;
+            foreach (var material in b)
             {
-                IINode node = RedHaloCore.Core.GetINodeByHandle(nodeHandle);
+                if (material.ClassName(false) != "Multi/Sub-Object")
+                {
+                    //Debug.Print(material.Name);
+                    var redHaloPBRMtl = Exporter.ExportMaterial(material, index);
 
-                IObject obj = node.ObjectRef;
-                IIDerivedObject dobj = RedHaloCore.Global.CreateDerivedObject(obj);
-                object objMod = RedHaloCore.Core.CreateInstance(SClass_ID.Osm, cid as IClass_ID);
-                IModifier mod = (IModifier)objMod;
-
-                dobj.AddModifier(mod, null, 0); // top of stack
-                node.ObjectRef = dobj;
-            }
-            catch (Exception ex)
-            {
-                Debug.Print(ex.Message);
-                return -1;
+                    redhaloScene.Materials.Add(redHaloPBRMtl);
+                }
+                index++;
             }
 
-            return 1;
+            #region WRITE XML FILE
+            var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
+            #endregion
         }
 
         // 塌陷所有物体
-        public static void CollapseObject() {
+        public static void CollapseObject()
+        {
             IINodeTab tabs = RedHaloCore.Global.INodeTab.Create();
 
             foreach (var item in GetSceneNodes())
@@ -1238,161 +1264,20 @@ namespace RedHaloM2B
             RedHaloCore.Core.ExplodeNodes(iTab);
         }
 
-        public static void ProcessTex(ITexmap tex)
+        // IColor to string
+        public static string IColorToString(IColor color, bool useFourNum = false)
         {
-            var texName = tex.ClassName(false);
-            switch (texName)
+            if (useFourNum)
             {
-                case "Bitmap":
-                    Debug.Print("====== BITMAP TEXTURE ======");
-                    GetParams(tex);                    
-                    IStdUVGen stdUVGen = GetValeByID<IReferenceTarget>(tex, 0, 14) as IStdUVGen;
-
-                    // 处理图片，如果Apply启用，且Width或Height小于1，渲染一张新图片，并启用此图片
-                    int croppintApply = GetValeByID<int>(tex, 0, 6);
-                    float ClipH = GetValeByID<float>(tex, 0, 3);
-                    float ClipU = GetValeByID<float>(tex, 0, 0);
-                    float ClipV = GetValeByID<float>(tex, 0, 1);
-                    float ClipW = GetValeByID<float>(tex, 0, 2);
-
-                    IBitmap new_bm = null;
-                    string _filename = GetValeByID<string>(tex, 0, 16);
-
-                    // 如果开启了裁切，重新渲染一张新图
-                    if (croppintApply == 1 && ((ClipH < 1) || (ClipW <1)))
-                    {
-                        string orig_filename = GetValeByID<string>(tex, 0, 16);
-                        string filepath = Path.GetDirectoryName(orig_filename);
-                        string filename = Path.GetFileNameWithoutExtension(orig_filename);
-                        string fileext = Path.GetExtension(orig_filename);
-                        
-                        // 渲染新贴图
-                        var bmInfo = GetValeByID<IPBBitmap>(tex, 0, 13);
-
-                        var bm_width = bmInfo.Bi.Width * ClipW > 2 ? bmInfo.Bi.Width * ClipW : 2;
-                        var bm_height = bmInfo.Bi.Height * ClipH > 2? bmInfo.Bi.Height * ClipH : 2;
-
-                        _filename = Path.Combine(filepath, $"{filename}_001{fileext}");
-                        new_bm = CreateBitmap(tex, (ushort)bm_width, (ushort)bm_height, _filename);
-                    }
-
-                    //ImageWrap
-                    // Tiling
-                    bool Wrap = Convert.ToBoolean(stdUVGen.GetFlag(1<<0)) || Convert.ToBoolean(stdUVGen.GetFlag(1 << 1));
-                    // Mirror
-                    bool Mirror = Convert.ToBoolean(stdUVGen.GetFlag(1<<2)) || Convert.ToBoolean(stdUVGen.GetFlag(1<<3));
-
-                    string _imgWrap = "REPEAT";
-                    if (Wrap || Mirror)
-                    {
-                        _imgWrap = "REPEAT";
-                    }
-                    else
-                    {
-                        _imgWrap = "CLIP";
-                    }
-
-                    if (Mirror && !Wrap)
-                    {
-                        _imgWrap = "MIRROR";
-                    }
-
-                    BitmapTex bitmapTex = new()
-                    {
-                        Filename = _filename,
-                        
-                        AlphaSource = GetValeByID<int>(tex, 0, 11),
-                        MonoOutput = GetValeByID<int>(tex, 0, 9),
-                        RGBOutput = GetValeByID<int>(tex, 0, 10),
-                        PreMultAlpha = GetValeByID<int>(tex, 0, 12),
-
-                        // UV Tile/Mirror/CLIP
-                        ImageWrap = _imgWrap,
-
-                        UScale = stdUVGen.GetUScl(0),
-                        VScale = stdUVGen.GetVScl(0),
-
-                        UOffset = stdUVGen.GetUOffs(0),
-                        VOffset = stdUVGen.GetVOffs(0),
-
-                        WAngle = stdUVGen.GetWAng(0),
-                        VAngle = stdUVGen.GetVAng(0),
-                        UAngle = stdUVGen.GetUAng(0),
-
-                        // MappingType Texture or Environment
-                        // Mapping
-                    };
-                    
-                    break;
-                case "Mix":
-                    // Mix Texture struct
-                    Debug.Print("====== MIX TEXTURE ======");
-                    //GetParams(tex);
-
-                    // Map1
-                    var t = GetValeByID<ITexmap>(tex, 0, 6);
-                    if (t != null)
-                    {
-                        ProcessTex(t);
-                        //Debug.Print(t.ToString());
-                    }
-                    else
-                    {
-                        Debug.Print("Map1 undefined");
-                    }                    
-
-                    // Map2
-                    var t2 = GetValeByID<ITexmap>(tex, 0, 7);
-                    if (t2 != null)
-                    {
-                        ProcessTex(t2);
-                    }
-
-                    break;
-                case "Checker":
-                    // Checker Texture struct
-                    Debug.Print("====== CHECKER TEXTURE ======");
-
-                    break;                
-                case "Dent":
-                    /*
-                    0-0,	Texmap,	    map1
-                    0-1,	Texmap,	    map2
-                    0-2,	Rgba,	    color1
-                    0-3,	Rgba,	    color2
-                    0-4,	Bool2,	    map1Enabled
-                    0-5,	Bool2,	    map2Enabled
-                    0-6,	Float,	    size
-                    0-7,	Float,	    strength
-                    0-8,	Int,	    iterations
-                    0-9,	Reftarg,	coords
-                    */
-
-                    Debug.Print("++++++++ DENT +++++++++++");                    
-                    //GetParams(tex);
-
-                    // Map1
-                    var dentMap1 = GetValeByID<ITexmap>(tex, 0, 0);
-                    if (dentMap1 != null)
-                    {
-                        ProcessTex(dentMap1);
-                        //Debug.Print(t.ToString());
-                    }
-                    else
-                    {
-                        Debug.Print("Map1 undefined");
-                    }
-
-                    // Map2
-                    var dentMap2 = GetValeByID<ITexmap>(tex, 0, 1);
-                    if (dentMap2 != null)
-                    {
-                        ProcessTex(dentMap2);
-                    }
-                    break;
-                default:
-                    break;
+                return $"{color.R},{color.G},{color.B},1";
             }
+
+            return $"{color.R},{color.G},{color.B}";
+        }
+
+        public static string IColorToString(IAColor color)
+        {
+            return $"{color.R},{color.G},{color.B},{color.A}";
         }
 
         // Write Log

@@ -268,7 +268,9 @@ namespace RedHaloM2B.Materials
         {
             UseRoughness = false;
 
-            Bump = 0.1f;
+            Bump = 0.03f;
+            DisplacementTexmapAmount = 1;
+            DisplacementWaterLevel = 0.5f;
         }
     }
 }

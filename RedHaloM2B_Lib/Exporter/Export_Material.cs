@@ -859,8 +859,6 @@ namespace RedHaloM2B
                     IStdMat2 stdMat = material as IStdMat2;
 
                     var shaderType = RedHaloTools.GetValeByID<int>(material, 0, 0);
-                    var std_specular_color = stdMat.GetSpecular(0);
-
                     /*
                      * 0 - Ambient Color
                      * 1 - Diffuse Color
@@ -878,7 +876,7 @@ namespace RedHaloM2B
                     */
 
                     #region DIFFUSE
-                    maxClr = material.GetDiffuse(0, false);
+                    maxClr = stdMat.GetDiffuse(0, false);
                     PBRMtl.DiffuseColor = RedHaloTools.IColorToString(maxClr, true);
                     
                     // Diffuse Texmap
@@ -887,11 +885,27 @@ namespace RedHaloM2B
                     {
                         PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
                     }
-
                     #endregion
 
-                    #region REFLECTION / SPECULAR / GLOSSINESS / ROUGHNESS
-                    //PBRMtl.Specular = stdMat.GetSpecular(0, false);
+                    #region REFLECTION / SPECULAR / GLOSSINESS / ROUGHNESS                    
+                    //var sp_clr = stdMat.GetSpecular(0, false);                    
+                    PBRMtl.Specular = stdMat.GetShinStr(0); // Specular level
+                    PBRMtl.SpecularRoughness = stdMat.GetShininess(0); // Glossiness
+
+                    // Specular textures
+                    texmap = stdMat.GetSubTexmap(3);
+                    if (texmap != null && stdMat.MapEnabled(3))
+                    {
+                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
+
+                    // Specular Roughness
+                    texmap = stdMat.GetSubTexmap(4);
+                    if (texmap != null && stdMat.MapEnabled(4))
+                    {
+                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                    }                    
+
                     #endregion
 
                     #region METALLIC
@@ -934,17 +948,32 @@ namespace RedHaloM2B
                     #endregion
 
                     #region BUMP
-
+                    PBRMtl.Bump = stdMat.GetTexmapAmt(8, 0) / 10;
+                    
+                    texmap = stdMat.GetSubTexmap(8);
+                    if(texmap != null && stdMat.MapEnabled(8)){
+                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
                     #endregion
 
                     #region DISPLACEMENT
+                    PBRMtl.DisplacementMax = stdMat.GetTexmapAmt(11, 0);
 
+                    texmap = stdMat.GetSubTexmap(11);
+                    if(texmap != null && stdMat.MapEnabled(11))
+                    {
+                        PBRMtl.DisplacementTexmap = MaterialUtils.GetTexmap(texmap);
+                    }
                     #endregion
 
                     break;
 
                 case "VRayCarPaintMtl":
                 case "VRayCarPaintMtl2":
+
+                    #region DIFFUSE
+
+                    #endregion
 
                     break;
                 default:

@@ -9,7 +9,6 @@ namespace RedHaloM2B
 {
     partial class Exporter
     {
-
         public enum stdMtlShaderType
         {
             ANISOTROPIC = 0,
@@ -1057,3 +1056,4 @@ namespace RedHaloM2B
         }
     }
 }
+ 

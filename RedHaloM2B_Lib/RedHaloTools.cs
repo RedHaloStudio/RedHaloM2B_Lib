@@ -1155,28 +1155,15 @@ namespace RedHaloM2B
             var mats = MaterialUtils.GetSceneMaterials().ToList();
             var mtl = mats.Where(ob => ob.Name == "Mat3d66_15228128_1_16716").First();
             //CleanupMtl(mtl);
-            //RedHaloPBRMtl PBRMtl = new()
-            //{
-            //    Name = mtl.Name,
-            //    SourceName = mtl.Name,
-            //    MaterialType = mtl.ClassName(false),
-            //};
 
-            //IColor maxClr = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
-            //Debug.Print($"{tex.Name} / {tex.ClassName(false)}");
+            // Export Normal material
+            //var mtlpbr = Exporter.ExportMaterial(mtl, 0);
 
-            // 获取材质
-            // Diffuse Texmap [VRayMtl]
-            //var tex = GetValeByID<ITexmap>(mtl, 0, 67);
-            //GetParams(tex);
+            // Export Light materials
+            var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
 
-            //var ti = new TexmapInfo();
-            // 如果材质类型不为空，进入循环
-            //if (tex != null)
-            //{
-            //ti = MaterialUtils.GetTexmap(tex);
-            //}
-            var mtlpbr = Exporter.ExportMaterial(mtl, 0);
+            // Mutil-Materials
+            var subMaterial = null;
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");

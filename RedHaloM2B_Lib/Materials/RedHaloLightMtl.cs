@@ -1,9 +1,10 @@
 ﻿using RedHaloM2B.Textures;
 using Newtonsoft.Json;
+using RedHaloM2B.Nodes;
 
 namespace RedHaloM2B.Materials
 {
-    internal class RedHaloLight
+    internal class RedHaloLightMtl
     {
         public string Name { get; set; }
         public string SourceName { get; set; }
@@ -11,6 +12,7 @@ namespace RedHaloM2B.Materials
         public string Type { get; set; }
 
         public string Color { get; set; }
+        public float[] ColorArray { get; set; }
         public TexmapInfo ColorTexmap { get; set; }
 
         public float Strength { get; set; }
@@ -25,5 +27,15 @@ namespace RedHaloM2B.Materials
         public bool VisibleRefract { get; set; }
 
         public bool AffectAlpha { get; set; }
+
+        public RedHaloLightMtl() {
+            Color = "1,1,1,1";
+            ColorArray = new[] { 1f, 1f, 1f };
+
+            UseTwoSided = true;
+            VisibleReflect = true;
+            VisibleDirect = true;
+            VisibleRefract = true;
+        }
     }
 }

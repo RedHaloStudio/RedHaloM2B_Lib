@@ -66,6 +66,7 @@
     <Compile Include="Exporter\Export_Geometry.cs" />
     <Compile Include="Exporter\Export_Lights.cs" />
     <Compile Include="Exporter\Export_Camera.cs" />
+    <Compile Include="Exporter\Export_Light_Material.cs" />
     <Compile Include="Exporter\Export_Material.cs" />
     <Compile Include="Exporter\Export_Scene.cs" />
     <Compile Include="Exporter\Productor.cs" />
@@ -75,8 +76,8 @@
     <Compile Include="Materials\BaseMtl.cs" />
     <Compile Include="Materials\DoubleMtl.cs" />
     <Compile Include="Materials\RedHaloPBRMtl.cs" />
-    <Compile Include="Materials\StandardMtl.cs" />
-    <Compile Include="Materials\RedHaloLight.cs" />
+    <Compile Include="Materials\RedHaloMutliMtl.cs" />
+    <Compile Include="Materials\RedHaloLightMtl.cs" />
     <Compile Include="Materials\VRayMtl.cs" />
     <Compile Include="Nodes\BaseNode.cs" />
     <Compile Include="Nodes\Camera.cs" />

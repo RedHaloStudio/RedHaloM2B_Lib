@@ -4,7 +4,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace RedHaloM2B.Utils
+namespace RedHaloM2B.RedHaloUtils
 {
     public class DictionaryEx<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
     {

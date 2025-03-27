@@ -1,8 +1,9 @@
 ﻿using Autodesk.Max;
+using Autodesk.Max.MaxSDK;
 using Newtonsoft.Json;
 using RedHaloM2B.Materials;
 using RedHaloM2B.Textures;
-using RedHaloM2B.Utils;
+using RedHaloM2B.RedHaloUtils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using Autodesk.Max.MaxSDK.Util;
+using Autodesk.Max.MaxSDK.AssetManagement;
 
 namespace RedHaloM2B
 {
@@ -1163,7 +1166,7 @@ namespace RedHaloM2B
             var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
 
             // Mutil-Materials
-            var subMaterial = null;
+            //var subMaterial = null;
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
@@ -1274,6 +1277,34 @@ namespace RedHaloM2B
             using (StreamWriter w = File.AppendText(logFilename))
             {
                 w.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd")} {DateTime.Now.TimeOfDay}]: {log}");
+            }
+        }
+
+        // Get Path
+        public static string GetActualPath(string OriginalPath)
+        {
+            IIFileResolutionManager fileResolutionManager = RedHaloCore.Global.IFileResolutionManager.Instance;
+            IPath Path = RedHaloCore.Global.MaxSDK.Util.Path.Create(OriginalPath);
+
+            if (fileResolutionManager.GetFullFilePath(Path, Autodesk.Max.MaxSDK.AssetManagement.AssetType.BitmapAsset, true))
+            {
+                return Path.CStr;
+            }
+            else if (fileResolutionManager.GetFullFilePath(Path, Autodesk.Max.MaxSDK.AssetManagement.AssetType.OtherAsset, true))
+            {
+                return Path.CStr;
+            }
+            else if (fileResolutionManager.GetFullFilePath(Path, Autodesk.Max.MaxSDK.AssetManagement.AssetType.PhotometricAsset, true))
+            {
+                return Path.CStr;
+            }
+            else if (fileResolutionManager.GetFullFilePath(Path, Autodesk.Max.MaxSDK.AssetManagement.AssetType.XRefAsset, true))
+            {
+                return Path.CStr;
+            }
+            else
+            {
+                return Path.CStr;
             }
         }
     }

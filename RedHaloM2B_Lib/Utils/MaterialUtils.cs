@@ -8,7 +8,7 @@ using System.IO;
 using System.Windows.Input;
 using Autodesk.Max.Plugins;
 
-namespace RedHaloM2B.Utils
+namespace RedHaloM2B.RedHaloUtils
 {
     internal class MaterialUtils
     {
@@ -138,6 +138,9 @@ namespace RedHaloM2B.Utils
 
                     IBitmap new_bm = null;
                     string _filename = RedHaloTools.GetValeByID<string>(tex, 0, 16);
+
+                    var realname = RedHaloTools.GetActualPath(_filename);
+                    Debug.Print($"Original Path: {_filename}\nReal Path: {realname}");
 
                     // 如果开启了裁切，重新渲染一张新图
                     if (croppintApply == 1 && ((ClipH < 1) || (ClipW < 1)))

@@ -9,7 +9,7 @@ namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloVRayDoubleMtl ExportDoubleMateral(IMtl inMaterial, int materialIndex)
+        public static RedHaloDoubleMtl ExportDoubleMaterial(IMtl inMaterial, int materialIndex)
         {
             string materialName = $"{materialIndex:D5}";
             string materialOriginalName = inMaterial.Name;
@@ -17,11 +17,11 @@ namespace RedHaloM2B
             //Set new name
             inMaterial.Name = materialName;
 
-            var doubleMtl = new RedHaloVRayDoubleMtl
+            var doubleMtl = new RedHaloDoubleMtl
             {
                 Name = materialName,
                 SourceName = materialOriginalName,
-                Type = inMaterial.ClassName(false),
+                Type = "DoubleMaterial",
             };
 
             //Debug.Print($"{inMaterial.ClassID.PartA.ToString("X")}");

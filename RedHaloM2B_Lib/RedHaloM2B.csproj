@@ -63,6 +63,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exporter\Export_Override_Material.cs" />
     <Compile Include="Exporter\Export_Geometry.cs" />
     <Compile Include="Exporter\Export_Double_Material.cs" />
     <Compile Include="Exporter\Export_Lights.cs" />
@@ -75,13 +76,13 @@
     <Compile Include="Exporter\Scene.cs" />
     <Compile Include="Exporter\Settings.cs" />
     <Compile Include="Materials\RedHaloBaseMtl.cs" />
-    <Compile Include="Materials\RedHaloVRayDoubleMtl.cs" />
+    <Compile Include="Materials\RedHaloDoubleMtl.cs" />
     <Compile Include="Materials\RedHaloPBRMtl.cs" />
     <Compile Include="Materials\RedHaloMutliMtl.cs" />
     <Compile Include="Materials\RedHaloLightMtl.cs" />
     <Compile Include="Materials\RedHaloVRayBlendMtl.cs" />
     <Compile Include="Materials\VRayMtl.cs" />
-    <Compile Include="Materials\VRayOverrideMtl.cs" />
+    <Compile Include="Materials\RedHaloOverrideMtl.cs" />
     <Compile Include="Nodes\BaseNode.cs" />
     <Compile Include="Nodes\Camera.cs" />
     <Compile Include="Nodes\Light.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Utils\RedHaloClassID.cs" />
     <Compile Include="Utils\LightingConvert.cs" />
     <Compile Include="Utils\MaterialUtils.cs" />
-    <Compile Include="Utils\MathUtils.cs" />
+    <Compile Include="Utils\RedHaloMathUtils.cs" />
     <Compile Include="Utils\DictionaryEx.cs" />
   </ItemGroup>
   <ItemGroup>

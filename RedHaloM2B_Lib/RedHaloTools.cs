@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Autodesk.Max.MaxSDK.Util;
 using Autodesk.Max.MaxSDK.AssetManagement;
+using System.Windows.Media.Media3D;
 
 namespace RedHaloM2B
 {
@@ -271,7 +272,7 @@ namespace RedHaloM2B
         {
 
             // Temperature must fit between 1000 and 40000 degrees.
-            temperature = MathUtils.Clamp(temperature, 1000, 40000);
+            temperature = RedHaloMathUtils.Clamp(temperature, 1000, 40000);
 
             // All calculations require temperature / 100, so only do the conversion once.
             temperature /= 100;
@@ -288,7 +289,7 @@ namespace RedHaloM2B
             {
                 // Note: the R-squared value for this approximation is 0.988.
                 red = (int)(329.698727446 * (Math.Pow(temperature - 60, -0.1332047592)));
-                red = MathUtils.Clamp(red, 0, 255);
+                red = RedHaloMathUtils.Clamp(red, 0, 255);
             }
 
             // Second: green.
@@ -303,7 +304,7 @@ namespace RedHaloM2B
                 green = (int)(288.1221695283 * (Math.Pow(temperature - 60, -0.0755148492)));
             }
 
-            green = MathUtils.Clamp(green, 0, 255);
+            green = RedHaloMathUtils.Clamp(green, 0, 255);
 
             // Third: blue.
             if (temperature >= 66)
@@ -318,7 +319,7 @@ namespace RedHaloM2B
             {
                 // Note: the R-squared value for this approximation is 0.998.
                 blue = (int)(138.5177312231 * Math.Log(temperature - 10) - 305.0447927307);
-                blue = MathUtils.Clamp(blue, 0, 255);
+                blue = RedHaloMathUtils.Clamp(blue, 0, 255);
             }
 
             IColor color = RedHaloCore.Global.Color.Create(red / 255.0, green / 255.0, blue / 255.0);
@@ -1122,7 +1123,8 @@ namespace RedHaloM2B
             var mats = MaterialUtils.GetSceneMaterials().ToList();
             var mtl = mats.Where(ob => ob.Name == "01").First();
             //CleanupMtl(mtl);
-            
+            Debug.Print($"{mtl.ClassID.PartA.ToString("X")}");
+            Debug.Print($"{mtl.ClassID.PartB.ToString("X")}");
             var index = 0;
             // Export Normal material
             var normalMtl = 10;
@@ -1142,7 +1144,10 @@ namespace RedHaloM2B
 
             // Mutil-Materials
             //var subMaterial = null;
-            var DoubleMaterial = Exporter.ExportDoubleMateral(mtl, 0);
+            //var DoubleMaterial = Exporter.ExportDoubleMaterial(mtl, 0);
+
+            // Export Override Materil
+            var DoubleMaterial = Exporter.ExportOverrideMaterial(mtl, 0);
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");

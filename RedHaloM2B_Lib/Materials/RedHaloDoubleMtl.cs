@@ -3,7 +3,7 @@ using RedHaloM2B.Textures;
 
 namespace RedHaloM2B.Materials
 {
-    internal class RedHaloVRayDoubleMtl : RedHaloBaseMtl
+    internal class RedHaloDoubleMtl : RedHaloBaseMtl
     {
         [JsonProperty("front_material")]
         public string FrontMaterial { get; set; }

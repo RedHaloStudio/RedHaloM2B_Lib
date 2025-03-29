@@ -2,7 +2,7 @@
 
 namespace RedHaloM2B.Materials
 {
-    internal class VRayOverrideMtl : RedHaloBaseMtl
+    internal class RedHaloOverrideMtl : RedHaloBaseMtl
     {
         [JsonProperty("base_material")]
         public string BaseMaterial { get; set; }

@@ -2,7 +2,7 @@
 
 namespace RedHaloM2B
 {
-    internal class MathUtils
+    internal class RedHaloMathUtils
     {
         public static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
         {

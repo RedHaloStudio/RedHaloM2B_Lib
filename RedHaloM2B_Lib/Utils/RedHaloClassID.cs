@@ -18,6 +18,7 @@ namespace RedHaloM2B
 
         public static readonly IClass_ID StandardMaterial = RedHaloCore.Global.Class_ID.Create(0x00000210, 0x00000000);
         public static readonly IClass_ID VRayDoubleMaterial = RedHaloCore.Global.Class_ID.Create(0x6066686A, 0x11731B4B);
-
+        public static readonly IClass_ID CoronaRaySwitchMtl = RedHaloCore.Global.Class_ID.Create(0x6816116A, 0xABE651DE);
+        public static readonly IClass_ID VRayOverrideMtl = RedHaloCore.Global.Class_ID.Create(0x15D20E6B, 0x54E217EB);
     }
 }

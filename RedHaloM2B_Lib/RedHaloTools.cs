@@ -395,29 +395,25 @@ namespace RedHaloM2B
                 pb2.GetValue(pb2.IndextoID(paramID), 0, ref result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IColor))
+            else if (type == typeof(IColor))
             {
                 var result = RedHaloCore.Global.Color.Create(0, 0, 0);
                 pb2.GetValue(pb2.IndextoID(paramID), 0, result, RedHaloCore.Forever, 0);
 
                 return (T)(Object)result;
             }
-
-            if (type == typeof(int))
+            else if (type == typeof(int))
             {
                 var result = 0;
                 pb2.GetValue(pb2.IndextoID(paramID), 0, ref result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(ITexmap))
+            else if (type == typeof(ITexmap))
             {
                 ITexmap result = pb2.GetTexmap(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IMtl))
+            else if (type == typeof(IMtl))
             {
                 var result = pb2.GetMtl(pb2.IndextoID(paramID), 0, 0);
                 return (T)(Object)result;
@@ -679,15 +675,6 @@ namespace RedHaloM2B
             }
         }
 
-        // 整理纹理路径
-        public static void CollectTextures()
-        {
-            //Autodesk.Max.IInterface.EnumAuxFiles(Autodesk.Max.IAssetEnumCallback, uint)
-            //AssetEnumCallBackExample callBackExample = new AssetEnumCallBackExample();
-            var ast = RedHaloCore.Global.MaxSDK.AssetManagement.IAssetManager.Instance;
-
-        }
-
         // Rescale whole scene
         public static void RescaleScene()
         {
@@ -727,9 +714,9 @@ namespace RedHaloM2B
                            ob.PartA.Equals(RHClassID.cidChaosScatter.PartA) ||
                            ob.PartA.Equals(RHClassID.cidLinkComposite.PartA);
 #else
-                    return ob.OperatorEquals(RHClassID.cidVRayPlane) ||
-                           ob.OperatorEquals(RHClassID.cidChaosScatter) ||
-                           ob.OperatorEquals(RHClassID.cidLinkComposite);
+                    return ob.OperatorEquals(RedHaloClassID.VRayPlane) ||
+                           ob.OperatorEquals(RedHaloClassID.ChaosScatter) ||
+                           ob.OperatorEquals(RedHaloClassID.LinkComposite);
 #endif
                 }).ToList(); ;
 
@@ -750,8 +737,8 @@ namespace RedHaloM2B
                     return ob.PartA.Equals(RHClassID.cidVRayProxy.PartA) ||
                            ob.PartA.Equals(RHClassID.cidCoronaProxy.PartA);
 #else
-                    return ob.OperatorEquals(RHClassID.cidVRayProxy) ||
-                           ob.OperatorEquals(RHClassID.cidCoronaProxy);
+                    return ob.OperatorEquals(RedHaloClassID.VRayProxy) ||
+                           ob.OperatorEquals(RedHaloClassID.CoronaProxy);
 #endif
                 }).ToList();
 
@@ -828,16 +815,6 @@ namespace RedHaloM2B
 
                     break;
                 case "Checker":
-                    /*
-                    0-0,	Float,	    soften
-                    0-1,	Rgba,	    color1
-                    0-2,	Rgba,	    color2
-                    0-3,	Texmap,	    map1
-                    0-4,	Texmap,	    map2
-                    0-5,	Bool2,	    map1Enabled
-                    0-6,	Bool2,	    map2Enabled
-                    0-7,	Reftarg,	coords
-                    */
                     Debug.Print("++++ CHECKER ++++");
 
 
@@ -853,19 +830,6 @@ namespace RedHaloM2B
 
                     break;
                 case "Dent":
-                    /*
-                    0-0,	Texmap,	    map1
-                    0-1,	Texmap,	    map2
-                    0-2,	Rgba,	    color1
-                    0-3,	Rgba,	    color2
-                    0-4,	Bool2,	    map1Enabled
-                    0-5,	Bool2,	    map2Enabled
-                    0-6,	Float,	    size
-                    0-7,	Float,	    strength
-                    0-8,	Int,	    iterations
-                    0-9,	Reftarg,	coords
-                    */
-
                     //GetParams(texmap);
                     var map1Enabled = GetValeByID<int>(texmap, 0, 4);
                     var map2Enabled = GetValeByID<int>(texmap, 0, 5);
@@ -1156,22 +1120,34 @@ namespace RedHaloM2B
         public static void Test()
         {
             var mats = MaterialUtils.GetSceneMaterials().ToList();
-            var mtl = mats.Where(ob => ob.Name == "Mat3d66_15228128_1_16716").First();
+            var mtl = mats.Where(ob => ob.Name == "01").First();
             //CleanupMtl(mtl);
+            
+            var index = 0;
+            // Export Normal material
+            var normalMtl = 10;
+            for (int i = 0; i < normalMtl; i++)
+            {
+
+            }
+
+            var lightMtl = 10;
+            var doubleMtl = 10;
 
             // Export Normal material
             //var mtlpbr = Exporter.ExportMaterial(mtl, 0);
 
             // Export Light materials
-            var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
+            //var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
 
             // Mutil-Materials
             //var subMaterial = null;
+            var DoubleMaterial = Exporter.ExportDoubleMateral(mtl, 0);
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
 
-            string json = JsonConvert.SerializeObject(mtlpbr, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(DoubleMaterial, Formatting.Indented);
 
             // 使用 JsonTextWriter 将 JSON 写入文件
             using (StreamWriter file = File.CreateText(outputFileName))
@@ -1179,7 +1155,7 @@ namespace RedHaloM2B
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(writer, mtlpbr);                
+                serializer.Serialize(writer, DoubleMaterial);
             }
         }
 
@@ -1280,7 +1256,7 @@ namespace RedHaloM2B
             }
         }
 
-        // Get Path
+        // Get Actual Path
         public static string GetActualPath(string OriginalPath)
         {
             IIFileResolutionManager fileResolutionManager = RedHaloCore.Global.IFileResolutionManager.Instance;

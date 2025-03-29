@@ -3,19 +3,19 @@ using RedHaloM2B.Textures;
 
 namespace RedHaloM2B.Materials
 {
-    public class RedHaloPBRMtl
+    public class RedHaloPBRMtl : RedHaloBaseMtl
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        //[JsonProperty("name")]
+        //public string Name { get; set; }
 
-        [JsonProperty("id")]
-        public string ID { get; set; }
+        //[JsonProperty("id")]
+        //public string ID { get; set; }
 
-        [JsonProperty("source_name")]
-        public string SourceName { get; set; }
+        //[JsonProperty("source_name")]
+        //public string SourceName { get; set; }
 
-        [JsonProperty("type")]
-        public string MaterialType { get; set; }
+        //[JsonProperty("type")]
+        //public string MaterialType { get; set; }
 
         [JsonProperty("use_roughness")]
         public bool UseRoughness { get; set; }

@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exporter\Export_Geometry.cs" />
+    <Compile Include="Exporter\Export_Double_Material.cs" />
     <Compile Include="Exporter\Export_Lights.cs" />
     <Compile Include="Exporter\Export_Camera.cs" />
     <Compile Include="Exporter\Export_Light_Material.cs" />
@@ -73,12 +74,14 @@
     <Compile Include="Exporter\Scene - 复制.cs" />
     <Compile Include="Exporter\Scene.cs" />
     <Compile Include="Exporter\Settings.cs" />
-    <Compile Include="Materials\BaseMtl.cs" />
-    <Compile Include="Materials\DoubleMtl.cs" />
+    <Compile Include="Materials\RedHaloBaseMtl.cs" />
+    <Compile Include="Materials\RedHaloVRayDoubleMtl.cs" />
     <Compile Include="Materials\RedHaloPBRMtl.cs" />
     <Compile Include="Materials\RedHaloMutliMtl.cs" />
     <Compile Include="Materials\RedHaloLightMtl.cs" />
+    <Compile Include="Materials\RedHaloVRayBlendMtl.cs" />
     <Compile Include="Materials\VRayMtl.cs" />
+    <Compile Include="Materials\VRayOverrideMtl.cs" />
     <Compile Include="Nodes\BaseNode.cs" />
     <Compile Include="Nodes\Camera.cs" />
     <Compile Include="Nodes\Light.cs" />
@@ -87,6 +90,7 @@
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="RedHaloCore.cs" />
+    <Compile Include="RedHaloCorona.cs" />
     <Compile Include="RedHaloTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Textures\BaseTex.cs" />
@@ -97,7 +101,7 @@
     <Compile Include="Textures\TextureInfoB.cs" />
     <Compile Include="Textures\TextureInfo.cs" />
     <Compile Include="Utils\AssetCallBack.cs" />
-    <Compile Include="Utils\ClassID.cs" />
+    <Compile Include="Utils\RedHaloClassID.cs" />
     <Compile Include="Utils\LightingConvert.cs" />
     <Compile Include="Utils\MaterialUtils.cs" />
     <Compile Include="Utils\MathUtils.cs" />

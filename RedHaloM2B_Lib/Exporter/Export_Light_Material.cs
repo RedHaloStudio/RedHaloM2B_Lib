@@ -37,7 +37,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 2);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 3) == 1)
                     {
-                        lightMtl.ColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        lightMtl.ColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -50,7 +50,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 7);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 8) == 1)
                     {
-                        lightMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        lightMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -70,7 +70,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 2);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 1) == 1)
                     {
-                        lightMtl.ColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        lightMtl.ColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -83,7 +83,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 10);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 11) == 1)
                     {
-                        lightMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        lightMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 

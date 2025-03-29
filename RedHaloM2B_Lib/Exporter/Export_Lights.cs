@@ -187,6 +187,7 @@ namespace RedHaloM2B
 
                     #region IES Filename
                     lightPB.GetValue(lightPB.IndextoID(5), 0, ref _iesfile, RedHaloCore.Forever, 0);
+                    _iesfile = RedHaloTools.GetActualPath(_iesfile);
                     #endregion
 
                     #region Affect Pass
@@ -335,6 +336,7 @@ namespace RedHaloM2B
 
                     #region IES Filename
                     lightPB.GetValue(lightPB.IndextoID(20), 0, ref _iesfile, RedHaloCore.Forever, 0);
+                    _iesfile = RedHaloTools.GetActualPath(_iesfile);
                     #endregion
 
                     #region Affect Pass

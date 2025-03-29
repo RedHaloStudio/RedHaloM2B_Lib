@@ -101,7 +101,7 @@ namespace RedHaloM2B.RedHaloUtils
         }
         
         // 纹理参数
-        public static TexmapInfo GetTexmap(ITexmap tex)
+        public static TexmapInfo ExportTexmap(ITexmap tex)
         {
             var texType = tex.ClassName(false);            
 
@@ -120,7 +120,7 @@ namespace RedHaloM2B.RedHaloUtils
             {
                 if (subtexmap != null)
                 {
-                    ti.subTexmapInfo.Add(key, GetTexmap(subtexmap));
+                    ti.subTexmapInfo.Add(key, ExportTexmap(subtexmap));
                 }
             }
 
@@ -137,10 +137,7 @@ namespace RedHaloM2B.RedHaloUtils
                     float ClipW = RedHaloTools.GetValeByID<float>(tex, 0, 2);
 
                     IBitmap new_bm = null;
-                    string _filename = RedHaloTools.GetValeByID<string>(tex, 0, 16);
-
-                    var realname = RedHaloTools.GetActualPath(_filename);
-                    Debug.Print($"Original Path: {_filename}\nReal Path: {realname}");
+                    string _filename = RedHaloTools.GetActualPath(RedHaloTools.GetValeByID<string>(tex, 0, 16));
 
                     // 如果开启了裁切，重新渲染一张新图
                     if (croppintApply == 1 && ((ClipH < 1) || (ClipW < 1)))
@@ -515,21 +512,21 @@ namespace RedHaloM2B.RedHaloUtils
                     var vrao_texmap_radius = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 1);
                     if(vrao_texmap_radius != null && RedHaloTools.GetValeByID<int>(tex, 0, 34) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_radius", GetTexmap(vrao_texmap_radius));
+                        ti.subTexmapInfo.Add("texmap_radius", ExportTexmap(vrao_texmap_radius));
                     }
 
                     // texmap_occluded
                     var vrao_texmap_occluded = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 3);
                     if(vrao_texmap_occluded != null && RedHaloTools.GetValeByID<int>(tex, 0, 37) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_occluded", GetTexmap(vrao_texmap_occluded));
+                        ti.subTexmapInfo.Add("texmap_occluded", ExportTexmap(vrao_texmap_occluded));
                     }
 
                     // texmap_unoccluded
                     var vrao_texmap_unoccluded = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 5);
                     if (vrao_texmap_unoccluded != null && RedHaloTools.GetValeByID<int>(tex, 0, 40) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_unoccluded", GetTexmap(vrao_texmap_unoccluded));
+                        ti.subTexmapInfo.Add("texmap_unoccluded", ExportTexmap(vrao_texmap_unoccluded));
                     }
 
                     break;
@@ -550,14 +547,14 @@ namespace RedHaloM2B.RedHaloUtils
                     var vr_normalmap = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 0);
                     if (vr_normalmap != null && RedHaloTools.GetValeByID<int>(tex, 0, 1) == 1)
                     {
-                        ti.subTexmapInfo.Add("normal_map", GetTexmap(vr_normalmap));
+                        ti.subTexmapInfo.Add("normal_map", ExportTexmap(vr_normalmap));
                     }
 
                     // bump map
                     var vr_bumpmap = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 3);
                     if (vr_bumpmap != null && RedHaloTools.GetValeByID<int>(tex, 0, 4) == 1)
                     {
-                        ti.subTexmapInfo.Add("bump_map", GetTexmap(vr_bumpmap));
+                        ti.subTexmapInfo.Add("bump_map", ExportTexmap(vr_bumpmap));
                     }
 
                     break;
@@ -574,7 +571,7 @@ namespace RedHaloM2B.RedHaloUtils
                     var vr_color2bump = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 0);
                     if (vr_color2bump != null)
                     {
-                        ti.subTexmapInfo.Add("texmap", GetTexmap(vr_color2bump));
+                        ti.subTexmapInfo.Add("texmap", ExportTexmap(vr_color2bump));
                     }
 
                     break;
@@ -595,7 +592,7 @@ namespace RedHaloM2B.RedHaloUtils
                     var vr_bump2normal = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 0);
                     if (vr_bump2normal != null)
                     {
-                        ti.subTexmapInfo.Add("texmap", GetTexmap(vr_bump2normal));
+                        ti.subTexmapInfo.Add("texmap", ExportTexmap(vr_bump2normal));
                     }
                     break;
 
@@ -720,14 +717,14 @@ namespace RedHaloM2B.RedHaloUtils
                     var vr_comptex_a = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 0);
                     if ( vr_comptex_a != null)
                     {
-                        ti.subTexmapInfo.Add("map1", GetTexmap(vr_comptex_a));
+                        ti.subTexmapInfo.Add("map1", ExportTexmap(vr_comptex_a));
                     }
 
                     // Source B
                     var vr_comptex_b = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 1);
                     if ( vr_comptex_b != null)
                     {
-                        ti.subTexmapInfo.Add("map2", GetTexmap(vr_comptex_b));
+                        ti.subTexmapInfo.Add("map2", ExportTexmap(vr_comptex_b));
                     }
 
                     // Operator
@@ -789,21 +786,21 @@ namespace RedHaloM2B.RedHaloUtils
                     var crao_texmap_radius = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 9);
                     if (crao_texmap_radius != null && RedHaloTools.GetValeByID<int>(tex, 0, 15) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_radius", GetTexmap(crao_texmap_radius));
+                        ti.subTexmapInfo.Add("texmap_radius", ExportTexmap(crao_texmap_radius));
                     }
 
                     // texmap_occluded
                     var crao_texmap_occluded = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 7);
                     if (crao_texmap_occluded != null && RedHaloTools.GetValeByID<int>(tex, 0, 13) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_occluded", GetTexmap(crao_texmap_occluded));
+                        ti.subTexmapInfo.Add("texmap_occluded", ExportTexmap(crao_texmap_occluded));
                     }
 
                     // texmap_unoccluded
                     var crao_texmap_unoccluded = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 8);
                     if (crao_texmap_unoccluded != null && RedHaloTools.GetValeByID<int>(tex, 0, 14) == 1)
                     {
-                        ti.subTexmapInfo.Add("texmap_unoccluded", GetTexmap(crao_texmap_unoccluded));
+                        ti.subTexmapInfo.Add("texmap_unoccluded", ExportTexmap(crao_texmap_unoccluded));
                     }
                     break;
 
@@ -829,21 +826,21 @@ namespace RedHaloM2B.RedHaloUtils
                     var cr_mix_map1 = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 6);
                     if(cr_mix_map1 != null && RedHaloTools.GetValeByID<int>(tex, 0, 12) == 1)
                     {
-                        ti.subTexmapInfo.Add("map1", GetTexmap(cr_mix_map1));
+                        ti.subTexmapInfo.Add("map1", ExportTexmap(cr_mix_map1));
                     }
 
                     // map2
                     var cr_mix_map2 = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 7);
                     if(cr_mix_map2 != null && RedHaloTools.GetValeByID<int>(tex, 0, 11) == 1)
                     {
-                        ti.subTexmapInfo.Add("map2", GetTexmap(cr_mix_map2));
+                        ti.subTexmapInfo.Add("map2", ExportTexmap(cr_mix_map2));
                     }
 
                     // mix mask
                     var cr_mix_mask = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 8);
                     if(cr_mix_mask != null && RedHaloTools.GetValeByID<int>(tex, 0, 13) == 1)
                     {
-                        ti.subTexmapInfo.Add("mask", GetTexmap(cr_mix_mask));
+                        ti.subTexmapInfo.Add("mask", ExportTexmap(cr_mix_mask));
                     }
 
                     break;
@@ -875,7 +872,7 @@ namespace RedHaloM2B.RedHaloUtils
                     var cr_ccTexmap = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 1);
                     if (cr_ccTexmap != null)
                     {
-                        ti.subTexmapInfo.Add("texmap", GetTexmap(cr_ccTexmap));
+                        ti.subTexmapInfo.Add("texmap", ExportTexmap(cr_ccTexmap));
                     }
 
                     break;
@@ -897,14 +894,14 @@ namespace RedHaloM2B.RedHaloUtils
                     var cr_normalmap = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 1);
                     if (cr_normalmap != null)
                     {
-                        ti.subTexmapInfo.Add("normal_map", GetTexmap(cr_normalmap));
+                        ti.subTexmapInfo.Add("normal_map", ExportTexmap(cr_normalmap));
                     }
 
                     // bump map
                     var cr_bumpmap = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 7);
                     if (cr_bumpmap != null && RedHaloTools.GetValeByID<int>(tex, 0, 8) == 1)
                     {
-                        ti.subTexmapInfo.Add("bump_map", GetTexmap(cr_bumpmap));
+                        ti.subTexmapInfo.Add("bump_map", ExportTexmap(cr_bumpmap));
                     }
                     break;
 
@@ -914,7 +911,7 @@ namespace RedHaloM2B.RedHaloUtils
                     
                     if(cr_bump_converter_tex != null)
                     {
-                        ti.subTexmapInfo.Add("texmap", GetTexmap(cr_bump_converter_tex));
+                        ti.subTexmapInfo.Add("texmap", ExportTexmap(cr_bump_converter_tex));
                         ti.Properties.Add("strength", RedHaloTools.GetValeByID<float>(tex, 0, 1));
                     }
                     
@@ -937,14 +934,14 @@ namespace RedHaloM2B.RedHaloUtils
                     var cr_front_tex = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 4);
                     if(cr_front_tex != null && RedHaloTools.GetValeByID<int>(tex, 0, 2) == 1)
                     {
-                        ti.subTexmapInfo.Add("map1", GetTexmap(cr_front_tex));
+                        ti.subTexmapInfo.Add("map1", ExportTexmap(cr_front_tex));
                     }
                     
                     // map2
                     var cr_back_tex = RedHaloTools.GetValeByID<ITexmap>(tex, 0, 5);
                     if(cr_back_tex != null && RedHaloTools.GetValeByID<int>(tex, 0, 3) == 1)
                     {
-                        ti.subTexmapInfo.Add("map2", GetTexmap(cr_back_tex));
+                        ti.subTexmapInfo.Add("map2", ExportTexmap(cr_back_tex));
                     }
 
                     break;
@@ -996,14 +993,14 @@ namespace RedHaloM2B.RedHaloUtils
                         tex = pb2.GetTexmap(9, 0, k);
                         if(tex != null)
                         {
-                            compositionLayer.Add("map", MaterialUtils.GetTexmap(tex));
+                            compositionLayer.Add("map", MaterialUtils.ExportTexmap(tex));
                         }
 
                         // ---mask tex
                         tex = pb2.GetTexmap(10, 0, k);
                         if(tex != null)
                         {
-                            compositionLayer.Add("mask_map", MaterialUtils.GetTexmap(tex));
+                            compositionLayer.Add("mask_map", MaterialUtils.ExportTexmap(tex));
                         }
                         else
                         {

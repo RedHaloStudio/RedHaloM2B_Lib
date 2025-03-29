@@ -3,7 +3,6 @@ using RedHaloM2B.Materials;
 using RedHaloM2B.RedHaloUtils;
 using System;
 using System.Diagnostics;
-using System.Windows.Media;
 
 namespace RedHaloM2B
 {
@@ -42,8 +41,9 @@ namespace RedHaloM2B
             {
                 Name = newName,
                 SourceName = sourceName,
-                MaterialType = material.ClassName(false),
+                Type = material.ClassName(false),
             };
+
             Debug.Print($"{material.ClassName(false)}");
 
             switch (material.ClassName(false))
@@ -125,7 +125,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 67);
                     if (texmap != null)
                     {
-                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     // Diffuse Roughness
@@ -135,7 +135,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 68);
                     if (texmap != null)
                     {
-                        PBRMtl.DiffuseRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -148,14 +148,14 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 70);
                     if (texmap != null)
                     {
-                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     // SpecularRoughness / Reflection Texmap
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 71);
                     if (texmap != null)
                     {
-                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -176,7 +176,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 73);
                     if (texmap != null)
                     {
-                        PBRMtl.MetallicTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.MetallicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -186,7 +186,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 38);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 39) == 1)
                     {
-                        PBRMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -200,21 +200,21 @@ namespace RedHaloM2B
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 79);
                         if (texmap != null )
                         {
-                            PBRMtl.SubsurfaceColorTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.SubsurfaceColorTexmap = MaterialUtils.ExportTexmap(texmap);
                         }
 
                         PBRMtl.SubsurfaceWeight = RedHaloTools.GetValeByID<float>(material, 0, 45);
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 80);
                         if (texmap != null)
                         {
-                            PBRMtl.SubsurfaceWeightTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.SubsurfaceWeightTexmap = MaterialUtils.ExportTexmap(texmap);
                         }
 
                         PBRMtl.SubsurfaceRadius = RedHaloTools.IColorToString(refractFogClr);
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 77);
                         if (texmap != null)
                         {
-                            PBRMtl.SubsurfaceRadiusTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.SubsurfaceRadiusTexmap = MaterialUtils.ExportTexmap(texmap);
                         }
 
 
@@ -222,7 +222,7 @@ namespace RedHaloM2B
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 78);
                         if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 25) == 1)
                         {
-                            PBRMtl.SubsurfaceScaleTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.SubsurfaceScaleTexmap = MaterialUtils.ExportTexmap(texmap);
                         }
                     }
                     #endregion
@@ -234,13 +234,13 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 1, 12);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 45) == 1)
                     {
-                        PBRMtl.AnisotropicTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 1, 13);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 48) == 1)
                     {
-                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -252,7 +252,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 74);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 7) == 1)
                     {
-                        PBRMtl.RefractionTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.RefractionTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -260,7 +260,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 75);
                     if (texmap != null)
                     {
-                        PBRMtl.RefractionRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.RefractionRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -270,7 +270,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 74);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 75) == 1)
                     {
-                        PBRMtl.CoatTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -278,7 +278,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 77);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 78) == 1)
                     {
-                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -286,7 +286,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 80);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 81) == 1)
                     {
-                        PBRMtl.CoatIORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatIORTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -294,7 +294,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 71);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 72) == 1)
                     {
-                        PBRMtl.CoatTintTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTintTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -302,7 +302,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 83);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 84) == 1)
                     {
-                        PBRMtl.CoatBumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatBumpTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -317,7 +317,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 65);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 66) == 1)
                     {
-                        PBRMtl.SheenColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SheenColorTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -325,7 +325,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 88);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 69) == 1)
                     {
-                        PBRMtl.SheenRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SheenRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
                     #endregion
@@ -337,7 +337,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 56);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 57) == 1)
                     {
-                        PBRMtl.EmissionColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.EmissionColorTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -345,7 +345,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 58);
                     if (texmap != null)
                     {
-                        PBRMtl.EmissionColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.EmissionColorTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
 
@@ -359,7 +359,7 @@ namespace RedHaloM2B
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 86);
                         if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 87) == 1)
                         {
-                            PBRMtl.ThinFilmTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.ThinFilmTexmap = MaterialUtils.ExportTexmap(texmap);
                             texmap = null;
                         }
                     }
@@ -372,7 +372,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 3, 89);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 3, 90) == 1)
                     {
-                        PBRMtl.ThinFilmIORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.ThinFilmIORTexmap = MaterialUtils.ExportTexmap(texmap);
                         texmap = null;
                     }
                     
@@ -444,7 +444,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 12);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 30) == 1)
                     {
-                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -458,7 +458,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 13);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 31) == 1)
                     {
-                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -475,7 +475,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 23);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 40) == 1)
                     {
-                        PBRMtl.IORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.IORTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -487,7 +487,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 17);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 35) == 1)
                     {
-                        PBRMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -512,14 +512,14 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 21);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 38) == 1)
                     {
-                        PBRMtl.AnisotropicTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     // anisiotropic rotation texmap
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 22);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 39) == 1)
                     {
-                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -545,7 +545,7 @@ namespace RedHaloM2B
                     if (texmap != null &&
                         RedHaloTools.GetValeByID<int>(material, 0, 45) == 1)
                     {
-                        PBRMtl.EmissionColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.EmissionColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -556,7 +556,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 18);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 36) == 1)
                     {
-                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.BumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -578,7 +578,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 25);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 42) == 1)
                     {
-                        PBRMtl.DisplacementTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DisplacementTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -613,7 +613,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 2);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 3) == 1)
                     {
-                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -626,7 +626,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 13);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 14) == 1)
                     {
-                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -641,7 +641,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 25);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 26) == 1)
                     {
-                        PBRMtl.IORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.IORTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -653,7 +653,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 8);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 9) == 1)
                     {
-                        PBRMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -670,7 +670,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 72);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 73) == 1)
                     {
-                        PBRMtl.SubsurfaceWeightTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SubsurfaceWeightTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 79);
@@ -681,7 +681,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 80);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 81) == 1)
                     {
-                        PBRMtl.SubsurfaceScaleTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SubsurfaceScaleTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.SubsurfaceScale = RedHaloTools.GetValeByID<float>(material, 0, 75);
@@ -690,7 +690,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 76);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 77) == 1)
                     {
-                        PBRMtl.SubsurfaceRadiusTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SubsurfaceRadiusTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -700,14 +700,14 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 17);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 18) == 1)
                     {
-                        PBRMtl.AnisotropicTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.AnisotropicRotation = RedHaloTools.GetValeByID<float>(material, 0, 20);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 21);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 22) == 1)
                     {
-                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.AnisotropicRotationTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -721,7 +721,7 @@ namespace RedHaloM2B
                         texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 29);
                         if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 30) == 1)
                         {
-                            PBRMtl.RefractionTexmap = MaterialUtils.GetTexmap(texmap);
+                            PBRMtl.RefractionTexmap = MaterialUtils.ExportTexmap(texmap);
                         }
                     }
                     #endregion
@@ -731,35 +731,35 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 37);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 38) == 1)
                     {
-                        PBRMtl.CoatTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatRoughness = RedHaloTools.GetValeByID<float>(material, 0, 44);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 45);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 46) == 1)
                     {
-                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatIOR = RedHaloTools.GetValeByID<float>(material, 0, 40);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 41);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 42) == 1)
                     {
-                        PBRMtl.CoatIORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatIORTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatTint = RedHaloTools.IColorToString(RedHaloTools.GetValeByID<IColor>(material, 0, 115));
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 116);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 117) == 1)
                     {
-                        PBRMtl.CoatTintTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTintTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatBump = RedHaloTools.GetValeByID<float>(material, 0, 121);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 119);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 120) == 1)
                     {
-                        PBRMtl.CoatBumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatBumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -772,7 +772,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 53);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 54) == 1)
                     {
-                        PBRMtl.SheenColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SheenColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
 
@@ -781,7 +781,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 57);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 58) == 1)
                     {
-                        PBRMtl.SheenRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SheenRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -794,7 +794,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 91);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 92) == 1)
                     {
-                        PBRMtl.EmissionColorTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.EmissionColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -816,7 +816,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 100);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 101) == 1)
                     {
-                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.BumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -839,17 +839,9 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 87);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 88) == 1)
                     {
-                        PBRMtl.DisplacementTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DisplacementTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
-
-                    break;
-
-                case "VRayLightMtl":                    
-                    //RedHaloTools.GetParams(material);
-                    break;
-                case "CoronaLightMtl":
-                    //RedHaloTools.GetParams(material);
 
                     break;
 
@@ -882,7 +874,7 @@ namespace RedHaloM2B
                     texmap = stdMat.GetSubTexmap(1);
                     if (texmap != null && stdMat.MapEnabled(1))
                     {
-                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -895,14 +887,14 @@ namespace RedHaloM2B
                     texmap = stdMat.GetSubTexmap(3);
                     if (texmap != null && stdMat.MapEnabled(3))
                     {
-                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     // Specular Roughness
                     texmap = stdMat.GetSubTexmap(4);
                     if (texmap != null && stdMat.MapEnabled(4))
                     {
-                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }                    
 
                     #endregion
@@ -917,7 +909,7 @@ namespace RedHaloM2B
                     texmap = stdMat.GetSubTexmap(6);
                     if(texmap != null && stdMat.MapEnabled(6))
                     {
-                        PBRMtl.OpacityTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -951,7 +943,7 @@ namespace RedHaloM2B
                     
                     texmap = stdMat.GetSubTexmap(8);
                     if(texmap != null && stdMat.MapEnabled(8)){
-                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.BumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -961,7 +953,7 @@ namespace RedHaloM2B
                     texmap = stdMat.GetSubTexmap(11);
                     if(texmap != null && stdMat.MapEnabled(11))
                     {
-                        PBRMtl.DisplacementTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DisplacementTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -978,7 +970,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 41);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 42) == 1)
                     {
-                        PBRMtl.DiffuseTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.DiffuseTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -987,14 +979,14 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 44);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material,0, 45) == 1)
                     {
-                        PBRMtl.SpecularTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.SpecularRoughness = RedHaloTools.GetValeByID<float>(material, 0, 4);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 47);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 48) == 1)
                     {
-                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -1004,35 +996,35 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 68);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 69) == 1)
                     {
-                        PBRMtl.CoatTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 26);
                     PBRMtl.CoatTint = RedHaloTools.IColorToString(maxClr, true);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 65);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 66) == 1){
-                        PBRMtl.CoatTintTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatTintTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatRoughness = RedHaloTools.GetValeByID<float>(material, 0, 32);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 74);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 75) == 1)
                     {
-                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatIOR = RedHaloTools.GetValeByID<float>(material, 0, 30);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 71);
                     if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 72) == 1)
                     {
-                        PBRMtl.CoatIORTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatIORTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     PBRMtl.CoatBump = RedHaloTools.GetValeByID<float>(material, 0, 79);
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 77);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 78) == 1)
                     {
-                        PBRMtl.CoatBumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.CoatBumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -1042,7 +1034,7 @@ namespace RedHaloM2B
                     texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 53);
                     if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 54) == 1)
                     {
-                        PBRMtl.BumpTexmap = MaterialUtils.GetTexmap(texmap);
+                        PBRMtl.BumpTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion

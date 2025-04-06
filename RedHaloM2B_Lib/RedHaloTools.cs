@@ -435,53 +435,45 @@ namespace RedHaloM2B
                 pb2.GetValue(pb2.IndextoID(paramID), 0, ref result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IColor))
+            else if (type == typeof(IColor))
             {
                 var result = RedHaloCore.Global.Color.Create(0, 0, 0);
                 pb2.GetValue(pb2.IndextoID(paramID), 0, result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-            
-            if (type == typeof(IAColor))
+            else if (type == typeof(IAColor))
             {
                 var result = RedHaloCore.Global.AColor.Create(0, 0, 0, 1);
                 pb2.GetValue(pb2.IndextoID(paramID), 0, result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(int))
+            else if (type == typeof(int))
             {
                 var result = 0;
                 pb2.GetValue(pb2.IndextoID(paramID), 0, ref result, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(ITexmap))
+            else if (type == typeof(ITexmap))
             {
                 ITexmap result = pb2.GetTexmap(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IPBBitmap))
+            else if (type == typeof(IPBBitmap))
             {
                 IPBBitmap result = pb2.GetBitmap(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(string))
+            else if (type == typeof(string))
             {
                 var result = pb2.GetStr(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IReferenceTarget))
+            else if (type == typeof(IReferenceTarget))
             {
                 var result = pb2.GetReferenceTarget(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
-
-            if (type == typeof(IIParamBlock2))
+            else if (type == typeof(IIParamBlock2))
             {
                 var result = pb2.GetParamBlock2(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
@@ -1147,12 +1139,13 @@ namespace RedHaloM2B
             //var DoubleMaterial = Exporter.ExportDoubleMaterial(mtl, 0);
 
             // Export Override Materil
-            var DoubleMaterial = Exporter.ExportOverrideMaterial(mtl, 0);
+            //var DoubleMaterial = Exporter.ExportOverrideMaterial(mtl, 0);
+
+            // Export Blend Material
+            var DoubleMaterial = Exporter.ExportBlendMaterial(mtl, 0);
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
-
-            string json = JsonConvert.SerializeObject(DoubleMaterial, Formatting.Indented);
 
             // 使用 JsonTextWriter 将 JSON 写入文件
             using (StreamWriter file = File.CreateText(outputFileName))
@@ -1160,6 +1153,7 @@ namespace RedHaloM2B
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
+                serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 serializer.Serialize(writer, DoubleMaterial);
             }
         }

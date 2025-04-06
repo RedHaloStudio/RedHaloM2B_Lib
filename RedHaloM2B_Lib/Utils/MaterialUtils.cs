@@ -103,6 +103,10 @@ namespace RedHaloM2B.RedHaloUtils
         // 纹理参数
         public static TexmapInfo ExportTexmap(ITexmap tex)
         {
+            if (tex == null)
+            {
+                return null;
+            }
             var texType = tex.ClassName(false);            
 
             IColor maxRGB = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
@@ -217,6 +221,7 @@ namespace RedHaloM2B.RedHaloUtils
                     Debug.Print($"======{texType}======");
                     //RedHaloTools.GetParams(tex);
                     break;
+                
                 case "Bricks":
                 case "Tiles":
                     Debug.Print($"======{texType}======");

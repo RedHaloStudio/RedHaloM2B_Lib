@@ -2,7 +2,7 @@
 
 namespace RedHaloM2B
 {
-    public class BaseNode
+    public class RedHaloBaseNode
     {
         //[XmlAttribute("id")]
         //public string ID { get; set; }

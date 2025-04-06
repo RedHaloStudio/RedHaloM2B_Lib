@@ -3,7 +3,7 @@
 namespace RedHaloM2B.Nodes
 {
     [XmlRoot("node")]
-    public class RedHaloGeometry : BaseNode
+    public class RedHaloGeometry : RedHaloBaseNode
     {
         [XmlAttribute("renderable")]
         public bool Renderable { get; set; }

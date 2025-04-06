@@ -3,7 +3,7 @@
 namespace RedHaloM2B.Nodes
 {
     [XmlRoot("light")]
-    public class RedHaloLight : BaseNode
+    public class RedHaloLight : RedHaloBaseNode
     {
         [XmlAttribute("color")]
         public string Color { get; set; }

@@ -3,7 +3,7 @@
 namespace RedHaloM2B.Nodes
 {
     [XmlRoot("camera")]
-    public class RedHaloCamera : BaseNode
+    public class RedHaloCamera : RedHaloBaseNode
     {
         [XmlAttribute("fov")]
         public float Fov { get; set; }

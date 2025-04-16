@@ -360,7 +360,7 @@ namespace RedHaloM2B
                     switch (color_mode)
                     {
                         case 2:
-                            _diffuseColor = $"1,1,,1";
+                            _diffuseColor = $"1,1,1,1";
                             break;
                         case 0:
                             _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";

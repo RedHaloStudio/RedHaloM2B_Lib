@@ -358,7 +358,7 @@ namespace RedHaloM2B
                 for (int d = 0; d < pb2.NumParams; d++)
                 {
                     var pid = pb2.IndextoID(d);
-                    var def = pb2.GetParamDef(pid);                  
+                    var def = pb2.GetParamDef(pid);
 
                     Debug.WriteLine($"{p}\t{d}\t{def.Type}\t{def.IntName}");
                 }
@@ -1115,8 +1115,8 @@ namespace RedHaloM2B
             var mats = MaterialUtils.GetSceneMaterials().ToList();
             var mtl = mats.Where(ob => ob.Name == "01").First();
             //CleanupMtl(mtl);
-            Debug.Print($"{mtl.ClassID.PartA.ToString("X")}");
-            Debug.Print($"{mtl.ClassID.PartB.ToString("X")}");
+            Debug.Print($"{mtl.ClassID.PartA.ToString("X")} / {mtl.ClassID.PartB.ToString("X")}");
+
             var index = 0;
             // Export Normal material
             var normalMtl = 10;
@@ -1128,8 +1128,64 @@ namespace RedHaloM2B
             var lightMtl = 10;
             var doubleMtl = 10;
 
+            var diffTex = RedHaloTools.GetValeByID<ITexmap>(mtl, 0, 12);
+
+            if(diffTex != null)
+            {
+                   
+            }
+
+            /*
+            int numParams = anim.NumSubs;
+            for (int i = 0; i < numParams; i++)
+            {
+                string paramName = anim.SubAnimName(i);
+                IAnimatable subAnim = anim.SubAnim(i);
+
+                if (paramName == "Parameters")
+                {
+                    if (subAnim is IIParamBlock pb)
+                    {                                            
+                        int count = pb.NumParams;
+                        for (int j = 0; j < count; j++)
+                        {
+                            var nodeName = pb.SubAnimName(j);
+                            ParamType type = pb.GetParameterType(j);
+                            string valueStr = "";
+
+                            switch (type)
+                            {
+                                case ParamType.Int:
+                                    int intValue = pb.GetInt(j, 0);
+                                    valueStr = intValue.ToString();
+                                    break;
+                                case ParamType.Float:
+                                    float floatValue = pb.GetFloat(j, 0);
+                                    valueStr = floatValue.ToString();
+                                    break;
+                                case ParamType.Rgba:
+                                    IColor colorValue = pb.GetColor(j, 0);
+                                    valueStr = $"{colorValue.R:F2},{colorValue.G},{colorValue.B}";
+                                    break;
+                                case ParamType.Point3:
+                                    var p = pb.GetPoint3(j, 0);
+                                    valueStr = $"{p.X:F2},{p.Y:F2},{p.Z:F2}";
+                                    break;
+                                default:
+                                    valueStr = "Unknown";
+                                    break;
+                            }
+
+                            Debug.Print($"Para {j} {nodeName}: Type: {type} - Value: {valueStr}");                                    
+                        }
+
+                    }
+                }
+            }
+            */
+
             // Export Normal material
-            //var mtlpbr = Exporter.ExportMaterial(mtl, 0);
+            var DoubleMaterial = Exporter.ExportMaterial(mtl, 0);
 
             // Export Light materials
             //var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
@@ -1142,7 +1198,7 @@ namespace RedHaloM2B
             //var DoubleMaterial = Exporter.ExportOverrideMaterial(mtl, 0);
 
             // Export Blend Material
-            var DoubleMaterial = Exporter.ExportBlendMaterial(mtl, 0);
+            //var DoubleMaterial = Exporter.ExportBlendMaterial(mtl, 0);
 
             string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
             string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
@@ -1281,6 +1337,40 @@ namespace RedHaloM2B
             {
                 return Path.CStr;
             }
+        }
+
+        // Cleanup unsupport textures
+        public static ITexmap CleanupTexture(ITexmap texmap)
+        {
+            if (texmap == null)
+                return null;
+
+            var texType = texmap.ClassName(false);
+
+            switch (texType)
+            {
+                case "Cellular":
+
+                    break;
+                default:
+                    break;
+            }
+
+            return null;
+        }
+    
+
+        public static void GetBitmapCroppingInfo(IBitmap bitmap)
+        {
+
+        }
+
+        public static IBitmap CropBitmap(IBitmap bitmap)
+        {
+            string realFilePath = RedHaloTools.GetActualPath(bitmap.BitmapInfo.Name);
+
+
+            return null;
         }
     }
 }

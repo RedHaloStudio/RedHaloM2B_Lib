@@ -98,11 +98,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Textures\BaseTex.cs" />
     <Compile Include="Textures\BitmapTex.cs" />
+    <Compile Include="Textures\TilesTex.cs" />
     <Compile Include="Textures\CheckerTex.cs" />
     <Compile Include="Textures\ColorTex.cs" />
     <Compile Include="Textures\MixTex.cs" />
-    <Compile Include="Textures\TextureInfoB.cs" />
     <Compile Include="Textures\TextureInfo.cs" />
+    <Compile Include="Utils\BitmapTypes.cs" />
+    <Compile Include="Utils\CropParameters.cs" />
     <Compile Include="Utils\RedHaloClassID.cs" />
     <Compile Include="Utils\LightingConvert.cs" />
     <Compile Include="Utils\MaterialUtils.cs" />

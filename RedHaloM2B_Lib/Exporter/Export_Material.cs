@@ -34,7 +34,7 @@ namespace RedHaloM2B
             float ior = 1.6f;
             float metallic = 0.0f;
             ITexmap texmap = null;
-
+            
             bool enabled = false;
 
             RedHaloPBRMtl PBRMtl = new()

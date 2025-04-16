@@ -3,9 +3,8 @@ using RedHaloM2B.Textures;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.IO;
-using System.Windows.Input;
+using RedHaloM2B.Utils;
 using Autodesk.Max.Plugins;
 
 namespace RedHaloM2B.RedHaloUtils
@@ -112,6 +111,8 @@ namespace RedHaloM2B.RedHaloUtils
             IColor maxRGB = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
             IAColor maxRGBA = RedHaloCore.Global.AColor.Create(0.8, 0.8, 0.8, 1);
             float amount = 0.0f;
+            IBitmapTex new_bm = null;
+
             Debug.Print($"======{texType.ToUpper()}======");
             
             var ti = new TexmapInfo()
@@ -140,8 +141,7 @@ namespace RedHaloM2B.RedHaloUtils
                     float ClipV = RedHaloTools.GetValeByID<float>(tex, 0, 1);
                     float ClipW = RedHaloTools.GetValeByID<float>(tex, 0, 2);
 
-                    IBitmap new_bm = null;
-                    string _filename = RedHaloTools.GetActualPath(RedHaloTools.GetValeByID<string>(tex, 0, 16));
+                    string _filename = RedHaloTools.GetActualPath(RedHaloTools.GetValeByID<string>(tex, 0, 16));                    
 
                     // 如果开启了裁切，重新渲染一张新图
                     if (croppintApply == 1 && ((ClipH < 1) || (ClipW < 1)))
@@ -159,6 +159,23 @@ namespace RedHaloM2B.RedHaloUtils
 
                         _filename = Path.Combine(filepath, $"{filename}_001{fileext}");
                         //new_bm = CreateBitmap(tex, (ushort)bm_width, (ushort)bm_height, _filename);
+                        Debug.Print($"{_filename}");
+
+                        //bmInfo.Bm.CropImage()
+
+                        IBitmapInfo bitmapInfo = RedHaloCore.Global.BitmapInfo.Create(); //bmInfo.Bi;//
+                        bitmapInfo.SetType((int)BitmapTypes.BitmapType.BMM_TRUE_32);
+                        bitmapInfo.SetHeight((ushort)bm_height);
+                        bitmapInfo.SetWidth((ushort)bm_width);
+                        bitmapInfo.SetGamma(2.2f);
+                        bitmapInfo.SetName(_filename);
+
+                        IBitmap newBitmap = RedHaloCore.Global.TheManager.Create(bitmapInfo);
+                        tex.RenderBitmap(0, newBitmap, 1.0f, true);
+                        newBitmap.OpenOutput(bitmapInfo);
+                        newBitmap.Write(bitmapInfo, -2000000);
+                        newBitmap.Close(bitmapInfo, -2000000);
+                        //tex.RenderBitmap(0, newBitmap, 1.0f, false);
                     }
 
                     IStdUVGen stdUVGen = RedHaloTools.GetValeByID<IReferenceTarget>(tex, 0, 14) as IStdUVGen;
@@ -223,27 +240,133 @@ namespace RedHaloM2B.RedHaloUtils
                     break;
                 
                 case "Bricks":
-                case "Tiles":
-                    Debug.Print($"======{texType}======");
-                    /// Has 4 refs
-                    /// 0:StdUVGen
-                    /// 1:ParamBlock2
-                    /// 2:???  /// 3:???
-                    //RedHaloTools.GetParams(tex);                  
+                case "Tiles":                    
+                    //Debug.Print($"======{texType}======");
+                    int numParamBlocks = tex.NumParamBlocks;
+                    IAnimatable anim = tex as IAnimatable;
 
-                    //var aaa = tex.GetParamBlock(0);
-                    //Debug.Print($"ParamBlock is {aaa}");
-                    var ppb2 = tex.GetReference(1);
-                    int numsubs = ppb2.NumSubs;
-                    //Debug.Print($"======={ppb2.NumSubs}");
-                    for (int i = 0; i < numsubs; i++)
+                    if (numParamBlocks == 0 && anim != null)
                     {
-                        //Debug.Print($"{i} - {ppb2.}");
+                        string paramName = anim.SubAnimName(1);
+                        IAnimatable subAnim = anim.SubAnim(1);
+
+                        if (paramName == "Parameters")
+                        {
+                            if (subAnim is IIParamBlock pb)
+                            {
+                                //float brickScale = 1f;
+                                float brickWidth = 1.0f;
+                                float brickHeight = 1.0f;
+                                
+                                float lineShift = 0f;
+                                float squash = 1f;
+                                int brick_frequency = 2;
+                                int squash_frequency = 2;
+                                
+                                // 0 Custom Tiles       1 Running Bond  2:Common Flemish Bond   3:English Bond
+                                // 4:1/2 Running Bond   5:Stack Bond    6:Fine Running Bond     7:Fine Stack Bond
+                                int tile_type = pb.GetInt(21, 0);
+
+                                // 0 Mortar Color: Type: Rgba
+                                maxRGB = pb.GetColor(0, 0);
+                                ti.Properties.Add("mortar_color", RedHaloTools.IColorToString(maxRGB, true));
+
+                                // Mortar Texmap
+                                //[JsonProperty("mortar_map")]
+
+                                // 1 Brick Color: Type: Rgba - Value: 0.60,0.6,0.6
+                                maxRGB = pb.GetColor(1, 0);
+                                ti.Properties.Add("brick_color", RedHaloTools.IColorToString(maxRGB, true));
+
+                                // Brick Texmap
+                                //[JsonProperty("bricks_map")]
+
+                                // 2 Horizontal Count: Type: Float - Value: 4
+                                float horizontal_count = pb.GetFloat(2, 0);
+                                // 3 Vertical Count: Type: Float - Value: 8
+                                float vertical_count = pb.GetFloat(3, 0);
+
+                                brickWidth = 1 / horizontal_count;
+                                brickHeight = 1 / vertical_count;
+
+                                // 4 Color Variance: Type: Float - Value: 0
+                                ti.Properties.Add("color_variance", pb.GetFloat(4, 0));
+
+                                // 5 Vertical Gap: Type: Float - Value: 0.5
+                                // 6 Horizontal Gap: Type: Float - Value: 0.5
+                                float mortar_size = 1f;
+                                mortar_size = pb.GetFloat(5, 0);
+
+                                // 7 Line Shift: Type: Float - Value: 0.5
+                                // Squash [Blender name]
+                                
+
+                                switch (tile_type)
+                                {
+                                    case 0:
+                                        lineShift = 1f - (pb.GetFloat(7, 0) + 0.5f) % 1f;
+                                        break;
+
+                                    case 1:
+                                    case 2: // Combined cases with the same outcome
+                                    case 6:
+                                    case 7:
+                                        lineShift = 0.5f;
+                                        break;
+
+                                    case 3:
+                                        lineShift = 0.5f;
+                                        squash = 0.5f;
+                                        break;
+
+                                    case 4:
+                                        lineShift = 0.25f;
+                                        break;
+
+                                    case 5:
+                                        lineShift = 0f;
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+
+                                ti.Properties.Add("brick_offset", lineShift);
+                                ti.Properties.Add("brick_frequency", brick_frequency);
+                                ti.Properties.Add("squash", squash);
+                                ti.Properties.Add("squash_frequency", squash_frequency);
+                                ti.Properties.Add("mortar_size", mortar_size);
+                                
+                                ti.Properties.Add("brick_width", brickWidth);
+                                ti.Properties.Add("brick_height", brickHeight);
+
+                                // 8 Random Shift: Type: Float - Value: 0
+                                ti.Properties.Add("random_shift", pb.GetFloat(8, 0));
+                            }
+                        }
+
+                        // Mortar texmap
+                        var mortarTexmap = anim.SubAnim(2);
+                        if (mortarTexmap != null)
+                        {
+                            if(mortarTexmap is ITexmap mtex)
+                            {
+                                ti.subTexmapInfo.Add("mortar_texmap", ExportTexmap(mtex));
+                            }
+                        }
+
+                        // Brick texmap
+                        var brickTexmap = anim.SubAnim(3);
+                        if (brickTexmap != null)
+                        {
+                            if(brickTexmap is ITexmap btex)
+                            {
+                                ti.subTexmapInfo.Add("brick_texmap", ExportTexmap(btex));
+                            }
+
+                        }
+
                     }
-                    
-
-                    //var abab = ppb2.GetParamDefByIndex(9);
-
                     break;
                 
                 case "Checker":

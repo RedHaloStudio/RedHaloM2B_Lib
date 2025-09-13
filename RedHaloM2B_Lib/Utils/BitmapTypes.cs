@@ -1,18 +1,6 @@
-﻿using Autodesk.Max;
-using Microsoft.SqlServer.Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows;
-
-namespace RedHaloM2B.Utils
+﻿namespace RedHaloM2B.Utils
 {
-    public class BitmapTypes
+    public class BITMAP_TYPES
     {
         public enum BitmapType
         {

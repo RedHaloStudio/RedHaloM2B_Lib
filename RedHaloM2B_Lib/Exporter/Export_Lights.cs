@@ -8,14 +8,14 @@ namespace RedHaloM2B
     {
         public static RedHaloLight ExportLights(IINode light, int lightIndex)
         {
-            string lightName = $"Light_{lightIndex:D5}";
+            string lightName = $"light_{lightIndex:D5}";
             string lightSourName = light.Name;
             //string gid = Guid.NewGuid().ToString();
 
             //Set new name
             light.Name = lightName;
 
-            string _diffuseColor = "1,1,1,0";
+            float[] _diffuseColor = [1, 1, 1, 1];
             float _strength = 0.0f;
             string _lighttype = "AREA";
             float _length = 0.0f;
@@ -61,14 +61,14 @@ namespace RedHaloM2B
 
                     if (color_mode == 0)
                     {
-                        _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";
+                        _diffuseColor = [filterColor.R, filterColor.G, filterColor.B, 1];
                     }
                     else
                     {
                         var kv = 2500.0f;
                         lightPB.GetValue(lightPB.IndextoID(5), 0, ref kv, RedHaloCore.Forever, 0);
                         var clr = RedHaloCore.Global.Color.FromKelvinTemperature(kv, 1);
-                        _diffuseColor = $"{clr.R},{clr.G},{clr.B},1";
+                        _diffuseColor = [clr.R, clr.G, clr.B, 1];
                     }
                     #endregion
 
@@ -169,14 +169,14 @@ namespace RedHaloM2B
 
                     if (color_mode == 0)
                     {
-                        _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";
+                        _diffuseColor = [filterColor.R, filterColor.G, filterColor.B, 1];
                     }
                     else
                     {
                         float kv = 2500.0f;
                         lightPB.GetValue(lightPB.IndextoID(29), 0, ref kv, RedHaloCore.Forever, 0);
                         var clr = RedHaloTools.GetRgbFromKelvin(kv);
-                        _diffuseColor = $"{clr.R},{clr.G},{clr.B},1";
+                        _diffuseColor = [clr.R, clr.G, clr.B, 1];
                     }
                     #endregion
 
@@ -213,7 +213,7 @@ namespace RedHaloM2B
 
                     #region Diffuse Color
                     lightPB.GetValue(lightPB.IndextoID(4), 0, filterColor, RedHaloCore.Forever, 0);
-                    _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";
+                    _diffuseColor = [filterColor.R, filterColor.G, filterColor.B, 1];
                     #endregion
 
                     #region Strength
@@ -255,13 +255,13 @@ namespace RedHaloM2B
                     switch (color_mode)
                     {
                         case 0:
-                            _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";
+                            _diffuseColor = [filterColor.R, filterColor.G, filterColor.B, 1];
                             break;
                         case 1:
                             var kv = 2500.0f;
                             lightPB.GetValue(lightPB.IndextoID(10), 0, ref kv, RedHaloCore.Forever, 0);
                             var clr = RedHaloTools.GetRgbFromKelvin(kv);
-                            _diffuseColor = $"{clr.R},{clr.G},{clr.B},1";
+                            _diffuseColor = [clr.R, clr.G, clr.B, 1];
                             break;
                         default:
                             break;
@@ -360,16 +360,16 @@ namespace RedHaloM2B
                     switch (color_mode)
                     {
                         case 2:
-                            _diffuseColor = $"1,1,1,1";
+                            _diffuseColor = [1, 1, 1, 1];
                             break;
                         case 0:
-                            _diffuseColor = $"{filterColor.R},{filterColor.G},{filterColor.B},1";
+                            _diffuseColor = [filterColor.R, filterColor.G, filterColor.B, 1];
                             break;
                         case 1:
                             var kv = 2800.0f;
                             lightPB.GetValue(lightPB.IndextoID(7), 0, ref kv, RedHaloCore.Forever, 0);
                             var clr = RedHaloTools.GetRgbFromKelvin(kv);
-                            _diffuseColor = $"{clr.R},{clr.G},{clr.B},1";
+                            _diffuseColor = [clr.R, clr.G, clr.B, 1];
                             break;
                         default:
                             break;
@@ -408,7 +408,7 @@ namespace RedHaloM2B
                     #region Color
 
                     maxColor = maxLight.GetRGBColor(0, RedHaloCore.Forever);
-                    _diffuseColor = $"{maxColor.X},{maxColor.Y},{maxColor.Z},1";
+                    _diffuseColor = [maxColor.X, maxColor.Y, maxColor.Z, 1];
                     #endregion
 
                     #region Strength
@@ -434,7 +434,7 @@ namespace RedHaloM2B
                 case 0x00001015:
                     #region Color
                     maxColor = maxLight.GetRGBColor(0, RedHaloCore.Forever);
-                    _diffuseColor = $"{maxColor.X},{maxColor.Y},{maxColor.Z},1";
+                    _diffuseColor = [maxColor.X, maxColor.Y, maxColor.Z, 1];
                     #endregion
 
                     #region Strength
@@ -459,7 +459,7 @@ namespace RedHaloM2B
                 case 0x00001012:
                     #region Color
                     maxColor = maxLight.GetRGBColor(0, RedHaloCore.Forever);
-                    _diffuseColor = $"{maxColor.X},{maxColor.Y},{maxColor.Z},1";
+                    _diffuseColor = [maxColor.X, maxColor.Y, maxColor.Z, 1];
                     #endregion
 
                     #region Strength
@@ -522,7 +522,7 @@ namespace RedHaloM2B
 
                     lightPB.GetValue(lightPB.IndextoID(4), 0, filterColor, RedHaloCore.Forever, 0);
                     var finalColor = filterColor.Multiply(filterColor);
-                    _diffuseColor = $"{finalColor.R},{finalColor.G},{finalColor.B},1";
+                    _diffuseColor = [finalColor.R, finalColor.G, finalColor.B, 1];
                     #endregion
 
                     #region Strength                        

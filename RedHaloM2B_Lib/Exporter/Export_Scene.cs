@@ -1,5 +1,6 @@
 ﻿using Autodesk.Max;
 using RedHaloM2B.Nodes;
+using RedHaloM2B.RedHaloUtils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,23 +11,47 @@ namespace RedHaloM2B
 {
     public class ExportScene
     {
-        // Export Scene
-        public static int SceneExporter(string fileFormat, bool explodeGroup, bool convertToPoly)
+        public static Dictionary<string, string> mapHash { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// <c>导出场景</c>
+        /// </summary>
+        /// <param name="fileFormat">导出模型格式</param>
+        /// <param name="explodeGroup">是否炸开组</param>
+        /// <param name="convertToPoly">是否转成Polygon</param>
+        /// <param name="scaleScene">是否缩放场景</param>
+        /// <returns>
+        /// <param>0. 正常无问题</param>
+        /// <param>1. 文件创建出错</param>
+        /// <param>2. 导出文件失败</param>
+        /// <param>3. 导出模型失败</param>
+        /// <param>4. 导出模型失败</param>
+        /// </returns>
+        public static int SceneExporter(string fileFormat, bool explodeGroup, bool convertToPoly, bool scaleScene = true)
         {
             #region GLOBAL VAR
+            const string baseFileName = "RHM2B_MODEL";
+            const string usdExtension = ".usd";
+            const string fbxExtension = ".fbx";
 
             int index = 0;
 
             // 临时文件（夹）有：
             // RH_M2B_TEMP
-            // RH_M2B_TEMP/Textures 不支持中文路径的贴图文件会复制到些目录
-            // %temp%/log.log 日志文件
-            // RH_M2B_TEMP/RHM2B_CONTENT.xml  （以下的参数：设置、物体、相机、灯光）
-            // RH_M2B_TEMP/RHM2B_material.xml (材质参数，最终会上面文件合并,暂时方案)
+            // RH_M2B_TEMP/Textures 不支持中文路径的贴图文件会复制到此目录下
+            // %temp%/RHM2B_LOG.log 日志文件
+            // RH_M2B_TEMP/RHM2B_CONTENT.xml  （以下的参数：设置、物体、相机、灯光、材质参数）
 
-            string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
-            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_CONTENT.xml");
-            string logFilename = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RHM2B_log.log");
+            string systemTempDirectory = Environment.GetEnvironmentVariable("TEMP");
+            string tempOutDirectory = Path.Combine(systemTempDirectory, "RH_M2B_TEMP");
+            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_CONTENT.json");
+            string logFilename = Path.Combine(systemTempDirectory, "RHM2B_LOG.log");
+
+            var appSettings = new AppSettings()
+            {
+                OutputPath = tempOutDirectory,
+                LogPath = systemTempDirectory,
+            };
 
             // 尝试删除log文件
             File.Delete(logFilename);
@@ -64,9 +89,6 @@ namespace RedHaloM2B
             // 塌陷所有物体，以防缩放物体时，发生不必要的变形, 蒙皮修改器也会消失
             RedHaloTools.CollapseObject();
 
-            // 缩放整个场景（以米为基础单位），匹配Blender单位尺寸
-            RedHaloTools.RescaleScene();
-
             // 清理自定义属性，blender不支持fbx的自定义属性
             RedHaloTools.CleanUserProperty();
 
@@ -81,6 +103,21 @@ namespace RedHaloM2B
             {
                 RedHaloTools.ExplodeGroup();
             }
+
+            // 图片的Hash值，字典
+            Dictionary<string, string> texHash = RedHaloTools.CollectAllBitmaps();
+
+            foreach (var item in texHash)
+            {
+                if (mapHash.ContainsKey(item.Key))
+                {
+                    continue;
+                }
+
+                mapHash.Add(item.Key, item.Value);
+            }
+
+            // 获取场景中所有的贴图
 
             #endregion
 
@@ -98,11 +135,9 @@ namespace RedHaloM2B
 
             #region SETTINGS
 
-            RedHaloTools.WriteLog("开始设置文件写入");
-
             redhaloScene.Settings = new RedHaloSettings
             {
-                MetersScale = (float)RedHaloCore.Global.GetSystemUnitScale(5), //5 Meter
+                WorldUnit = (float)RedHaloCore.Global.GetSystemUnitScale(5), //5 Meter
                 ImageWidth = RedHaloCore.Core.RendWidth,
                 ImageHeight = RedHaloCore.Core.RendHeight,
                 ImagePixelAspect = RedHaloCore.Core.ImageAspRatio,
@@ -110,24 +145,31 @@ namespace RedHaloM2B
                 AnimateEnd = endFrame,
                 FrameRate = 4800 / RedHaloCore.Global.TicksPerFrame, // There are always 4800 ticks per second, this means that ticksPerFrame is dependent on the frames per second rate (ticksPerFrame * frameRate == 4800)
 
-#if MAX2022 || MAX2023
+#if   MAX2022 || MAX2023
                 Gamma = RedHaloCore.Global.GammaMgr.DispGamma,
-#elif MAX2024 || MAX2025
+#elif MAX2024 || MAX2025 || MAX2026
                 Gamma = RedHaloCore.Global.GammaMgr.DisplayGamma,
 #else
                 Gamma = 1.0f,
 #endif
 
                 LinearWorkflow = 0,
-                ExportFormat = fileFormat
+                ExportFormat = fileFormat,
+                OutputPath = tempOutDirectory,
             };
 
-            RedHaloTools.WriteLog("设置文件写入完成");
+            // 设置日志文件
 
             #endregion
 
-            var sceneNodes = RedHaloTools.GetSceneNodes();
+            // 缩放整个场景（以米为基础单位），匹配Blender单位尺寸
+            if (scaleScene)
+            {
+                RedHaloTools.RescaleScene(redhaloScene.Settings.WorldUnit);
+            }
+            RedHaloTools.WriteLog($"场景缩放比例 ：{redhaloScene.Settings.WorldUnit}");
 
+            var sceneNodes = RedHaloTools.GetSceneNodes();
             #region EXPORT NODES
 
             IEnumerable<IINode> staticMesh = sceneNodes.Where(o =>
@@ -156,7 +198,7 @@ namespace RedHaloM2B
                         RedHaloCore.Global.IInstanceMgr.InstanceMgr.MakeObjectsUnique(tabs, 1);
                     }
 
-                    string baseobj = $"Mesh_{index:D5}"; //tabs[0].Name;
+                    string baseobj = $"mesh_{index:D5}"; //tabs[0].Name;
 
                     for (int i = 0; i < tabs.Count; i++)
                     {
@@ -180,8 +222,7 @@ namespace RedHaloM2B
                     RedHaloTools.ChangeProxyDisplay(tabs[0], RedHaloTools.ProxyMode.FULL);
                 }
             }
-
-            RedHaloTools.WriteLog($"共导出 {staticMesh.Count()} 个物体");
+            RedHaloTools.WriteLog($"场景中共有 {staticMesh.Count()} 个物体，导出 {staticMesh.Count()} 个");
             // 重置Index
             index = 0;
             nodeKeys.Clear();
@@ -224,7 +265,7 @@ namespace RedHaloM2B
                 {
                     RedHaloCore.Global.IInstanceMgr.InstanceMgr.GetInstances(light, tabs);
 
-                    string BaseObjectName = $"Light_{index:D5}";
+                    string BaseObjectName = $"light_{index:D5}";
 
                     for (int i = 0; i < tabs.Count; i++)
                     {
@@ -251,8 +292,176 @@ namespace RedHaloM2B
 
             #endregion
 
-            #region WRITE XML FILE
-            var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
+            #region EXPORT MATERIALS
+
+            // 清理场景中不支持的材质
+            RedHaloTools.CleanupMaterials();
+
+            var materials = MaterialUtils.GetSceneMaterials();
+
+            var materialIndex = 0;
+
+            var basePbrMaterialType = new HashSet<string> {
+                   "VRayMtl", "CoronaPhysicalMtl","\rCoronaPhysicalMtl", "CoronaLegacyMtl", "Standard (Legacy)", "StandardMaterial", "VRayCarPaintMtl", "VRayCarPaintMtl2"
+            };
+
+            var lightMaterialType = new HashSet<string> {
+                   "VRayLightMtl", "CoronaLightMtl"
+            };
+
+            // Single Material
+            foreach (var material in materials)
+            {
+                // 清理不支持的纹理
+                RedHaloTools.CleanupMaterial(material);
+
+                var materialType = material.ClassName(false);
+                var originalName = material.Name;
+
+                RedHaloTools.WriteLog($"材质 ：{originalName}");
+
+                try
+                {
+                    if (basePbrMaterialType.Contains(materialType))
+                    {
+                        var redHaloPBRMtl = Exporter.ExportMaterial(material, materialIndex);
+                        if (redHaloPBRMtl != null)
+                        {
+                            redHaloPBRMtl.Type = "pbr_material";
+                            redhaloScene.Materials.Add(redHaloPBRMtl);
+                        }
+                    }
+                    else if (lightMaterialType.Contains(materialType))
+                    {
+                        var redHaloLightMtl = Exporter.ExportLightMaterial(material, materialIndex);
+                        if (redHaloLightMtl != null)
+                        {
+                            redHaloLightMtl.Type = "light_material";
+                            redhaloScene.Materials.Add(redHaloLightMtl);
+                        }
+                    }
+
+                    //if (materialType == "CoronaSelectMtl")
+                    //{
+                    //    var selectIndex = RedHaloTools.GetValueByID<int>(material, 0, 2);
+                    //    var pb = material.GetParamBlock(0);
+                    //    var sub = pb.GetMtl(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
+                    //}
+                }
+                catch (Exception)
+                {
+                    RedHaloTools.WriteLog($"错误材质名 ：{material.Name}，原始材质名：{originalName}, 类型：{materialType}");
+                }
+
+                materialIndex++;
+            }
+
+            RedHaloTools.WriteLog($"双面材质开始。。。");
+
+            // mutli materials
+            foreach (var material in materials)
+            {
+                var materialType = material.ClassName(false);
+
+                RedHaloTools.WriteLog($"材质 ：{material.Name}，类型：{materialType}");
+
+                if (materialType == "VRayBlendMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayBlendMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "CoronaLayerMtl")
+                {
+                    var redHaloMtl = Exporter.ExportCoronaLayerMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "Blend")
+                {
+                    var redHaloMtl = Exporter.ExportDoubleMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "VRay2SidedMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayDoubleMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "VRayOverrideMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayOverrideMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "CoronaRaySwitchMtl")
+                {
+                    var redHaloMtl = Exporter.ExportCoronaRaySwitchMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+
+                materialIndex++;
+            }
+
+            #endregion
+
+            #region WRITE XML FILE / JSON FILE
+            //var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
+            var writeSucess = RedHaloTools.WriteJsonFile<RedHaloScene>(redhaloScene, outputFileName);
+            if (!writeSucess)
+            {
+                RedHaloTools.WriteLog($"导出文件失败，请检查文件权限");
+                return 2;
+            }
+            else
+            {
+                RedHaloTools.WriteLog($"导出文件成功，文件路径：{outputFileName}");
+            }
+            #endregion
+
+            #region EXPORT MODELS
+
+            if (writeSucess)
+            {
+                string outputModelFileName = "";
+                if (redhaloScene.Settings.ExportFormat == "USD")
+                {
+                    if (RedHaloTools.IsPluginInstalled("USD Importer"))
+                    {
+                        outputModelFileName = Path.Combine(redhaloScene.Settings.OutputPath, baseFileName + usdExtension);
+                        RedHaloTools.ExportUSDFile(outputModelFileName);
+                    }
+                }
+                else
+                {
+                    outputModelFileName = Path.Combine(redhaloScene.Settings.OutputPath, baseFileName + fbxExtension);
+                    // 其他格式的导出
+                    RedHaloTools.ExportFBXFile(outputModelFileName);
+                }
+
+
+                RedHaloTools.WriteLog($"导出模型成功，文件路径：{outputModelFileName}");
+                /// return 0;
+            }
+            else
+            {
+                RedHaloTools.WriteLog($"导出模型失败，请检查文件权限");
+                return 3;
+            }
             #endregion
 
             return 0;

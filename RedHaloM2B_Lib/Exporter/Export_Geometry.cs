@@ -19,7 +19,7 @@ namespace RedHaloM2B
             }
 
             string originalName = maxNode.Name;
-            string newName = $"Mesh_{index:D5}";
+            string newName = $"mesh_{index:D5}";
 
             // Set object name to new name
             maxNode.Name = newName;
@@ -29,7 +29,7 @@ namespace RedHaloM2B
                 Name = newName,
                 OriginalName = originalName,
                 Transform = RedHaloTools.ConvertMatrixToString(tm),
-                PivotOffset = $"{offset_object.X},{offset_object.Y},{offset_object.Z}",
+                PivotOffset = [offset_object.X, offset_object.Y, offset_object.Z],
                 Renderable = maxNode.Renderable,
                 VisibleCamera = maxNode.PrimaryVisibility,
                 VisibleSpecular = maxNode.SecondaryVisibility,

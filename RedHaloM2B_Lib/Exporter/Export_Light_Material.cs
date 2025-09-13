@@ -1,9 +1,12 @@
 ﻿using Autodesk.Max;
+using Autodesk.Max.IGameObject;
 using RedHaloM2B.Materials;
 using RedHaloM2B.RedHaloUtils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RedHaloM2B
 {
@@ -29,13 +32,12 @@ namespace RedHaloM2B
             {
                 case "VRayLightMtl":
                     #region COLOR
-                    maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 0);
+                    maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 0);
 
-                    lightMtl.Color = RedHaloTools.IColorToString(maxClr, true);
-                    lightMtl.ColorArray = new[] { maxClr.R, maxClr.G, maxClr.B }; 
+                    lightMtl.Color = [maxClr.R, maxClr.G, maxClr.B, 1]; //RedHaloTools.IColorToString(maxClr, true);
                     
-                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 2);
-                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 3) == 1)
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 2);
+                    if(texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 3) == 1)
                     {
                         lightMtl.ColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
@@ -43,32 +45,31 @@ namespace RedHaloM2B
 
                     #region STRENGTH
                     // VRayLightMtl && CoronaLightMtl not texture of strength
-                    lightMtl.Strength = RedHaloTools.GetValeByID<float>(material, 0, 2);
+                    lightMtl.Strength = RedHaloTools.GetValueByID<float>(material, 0, 2);
                     #endregion
 
                     #region OPACITY
-                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 7);
-                    if(texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 8) == 1)
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 7);
+                    if(texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 8) == 1)
                     {
                         lightMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
                     #region OTHERS
-                    lightMtl.UseTwoSided = RedHaloTools.GetValeByID<int>(material, 0, 4) == 1;
+                    lightMtl.UseTwoSided = RedHaloTools.GetValueByID<int>(material, 0, 4) == 1;
                     #endregion
 
                     break;
 
                 case "CoronaLightMtl":
                     #region COLOR
-                    maxClr = RedHaloTools.GetValeByID<IColor>(material, 0, 3);
+                    maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 3);
 
-                    lightMtl.Color = RedHaloTools.IColorToString(maxClr, true);
-                    lightMtl.ColorArray = new[] { maxClr.R, maxClr.G, maxClr.B };
+                    lightMtl.Color = [maxClr.R, maxClr.G, maxClr.B, 1];
 
-                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 2);
-                    if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 1) == 1)
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 2);
+                    if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 1) == 1)
                     {
                         lightMtl.ColorTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
@@ -76,23 +77,23 @@ namespace RedHaloM2B
 
                     #region STRENGTH
                     // VRayLightMtl && CoronaLightMtl not texture of strength
-                    lightMtl.Strength = RedHaloTools.GetValeByID<float>(material, 0, 0);
+                    lightMtl.Strength = RedHaloTools.GetValueByID<float>(material, 0, 0);
                     #endregion
 
                     #region OPACITY
-                    texmap = RedHaloTools.GetValeByID<ITexmap>(material, 0, 10);
-                    if (texmap != null && RedHaloTools.GetValeByID<int>(material, 0, 11) == 1)
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 10);
+                    if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 11) == 1)
                     {
                         lightMtl.OpacityTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
                     #region OTHERS
-                    lightMtl.UseTwoSided = RedHaloTools.GetValeByID<int>(material, 0, 17) == 1;
-                    lightMtl.VisibleReflect = RedHaloTools.GetValeByID<int> (material, 0, 7) == 1;
-                    lightMtl.VisibleDirect = RedHaloTools.GetValeByID<int>(material, 0, 8) == 1;
-                    lightMtl.VisibleRefract = RedHaloTools.GetValeByID<int>(material, 0, 9) == 1;
-                    lightMtl.AffectAlpha = RedHaloTools.GetValeByID<int>(material, 0, 4) == 1;
+                    lightMtl.UseTwoSided = RedHaloTools.GetValueByID<int>(material, 0, 17) == 1;
+                    lightMtl.VisibleReflect = RedHaloTools.GetValueByID<int> (material, 0, 7) == 1;
+                    lightMtl.VisibleDirect = RedHaloTools.GetValueByID<int>(material, 0, 8) == 1;
+                    lightMtl.VisibleRefract = RedHaloTools.GetValueByID<int>(material, 0, 9) == 1;
+                    lightMtl.AffectAlpha = RedHaloTools.GetValueByID<int>(material, 0, 4) == 1;
                     #endregion
 
                     break;
@@ -102,7 +103,7 @@ namespace RedHaloM2B
             }
 
             return lightMtl;
+            }
         }
-    }
 }
  

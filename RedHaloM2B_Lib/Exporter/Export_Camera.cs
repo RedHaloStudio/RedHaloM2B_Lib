@@ -23,15 +23,12 @@ namespace RedHaloM2B
 
             // 相机名称设置
             string cameraSourceName = camera.Name;
-            string cameraName = $"Camera_{cameraIndex:D5}";
+            string cameraName = $"camera_{cameraIndex:D5}";
             camera.Name = cameraName;
 
             // 创建 Max 相机和相机状态对象
             var maxCamera = camera.ObjectRef.FindBaseObject() as ICameraObject;
             maxCamera?.EvalCameraState(0, foreverTime, maxCameraState);
-
-            // 如果相机获取出错，返回null
-            //if (maxCamera == null) return null;
 
             // 获取 ParamBlock2，如果没有则设置 flag
             IIParamBlock2 camParamBlock = null;
@@ -48,7 +45,6 @@ namespace RedHaloM2B
                 }
                 catch (Exception ex)
                 {
-                    Debug.Print($"Error retrieving SubAnim(0): {ex.Message}");
                     return false;
                 }
             }

@@ -1,8 +1,6 @@
 ﻿using Autodesk.Max;
-using Autodesk.Max.MaxSDK;
+using Autodesk.Max.MaxSDK.Util;
 using Newtonsoft.Json;
-using RedHaloM2B.Materials;
-using RedHaloM2B.Textures;
 using RedHaloM2B.RedHaloUtils;
 using System;
 using System.Collections.Generic;
@@ -13,9 +11,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using Autodesk.Max.MaxSDK.Util;
-using Autodesk.Max.MaxSDK.AssetManagement;
-using System.Windows.Media.Media3D;
 
 namespace RedHaloM2B
 {
@@ -23,6 +18,15 @@ namespace RedHaloM2B
     {
         // 取得CPU的核心数量，进行多线程计算
         public static int coreNumber = Environment.ProcessorCount;
+
+        // Textures HashSet
+        public static Dictionary<string, string> texturesHash = new Dictionary<string, string>();
+
+        // 不支持的中文路径的文件后缀
+        public HashSet<string> unsupportChsFiles = new HashSet<string>
+        {
+            "exr"
+        };
 
         /// <summary>
         /// Replace all sym use "_"
@@ -76,17 +80,53 @@ namespace RedHaloM2B
             return BitConverter.ToString(hashBytes).Replace("-", "");
         }
 
-        // Calc MD5 From File
-        public static string CalcMD5FromFile(string path)
+        public struct VersionNumber
         {
-            if (Directory.Exists(path))
-            {
-                FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
-                MD5 md5 = MD5.Create();
-                byte[] hashBytes = md5.ComputeHash(file);
-                file.Close();
+            public int Major;
+            public int Minor;
+            public int Revision;
+            public int BuildNumber;
+        }
 
-                return BitConverter.ToString(hashBytes).Replace("-", "");
+        public static VersionNumber GetMaxVersion()
+        {
+            // https://getcoreinterface.typepad.com/blog/2017/02/querying-the-3ds-max-version.html
+#if MAX2022 || MAX2023 || MAX2024 || MAX2025 || MAX2026
+            var versionString = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery("getFileVersion \"$max/3dsmax.exe\"", ManagedServices.MaxscriptSDK.ScriptSource.NotSpecified);
+#else
+            var versionString = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery("getFileVersion \"$max/3dsmax.exe\"");
+#endif
+            var versionSplit = versionString.Split(',');
+            int major, minor, revision, buildNumber = 0;
+            int.TryParse(versionSplit[0], out major);
+            int.TryParse(versionSplit[1], out minor);
+            int.TryParse(versionSplit[2], out revision);
+            int.TryParse(versionSplit[3], out buildNumber);
+            return new VersionNumber { Major = major, Minor = minor, Revision = revision, BuildNumber = buildNumber };
+        }
+
+        /// <summary>
+        /// Calc MD5 From FileSteam
+        /// </summary>
+        /// <param name="path">file path</param>
+        /// <param name="bufferSize">file stream buffer size</param>
+        /// <returns></returns>
+        public static string CalcMD5FromFile(string path, int bufferSize = 4096)
+        {
+            if (File.Exists(path))
+            {
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {                    
+                    var md5 = MD5.Create();
+                    byte[] buffer = new byte[bufferSize];
+                    int bytesRead;
+                    while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        md5.TransformBlock(buffer, 0, bytesRead, null, 0);
+                    }
+                    md5.TransformFinalBlock(new byte[0], 0, 0); // 完成计算
+                    return BitConverter.ToString(md5.Hash).Replace("-", "").ToLower();
+                }
             }
             else
             {
@@ -94,7 +134,6 @@ namespace RedHaloM2B
             }
         }
 
-        // Get All Nodes
         /// <summary>
         /// Get all objects with children
         /// </summary>
@@ -170,12 +209,6 @@ namespace RedHaloM2B
             }
         }
 
-        // Get All Files
-        public static void GetAllFiles(string path, bool subfolder)
-        {
-
-        }
-
         public static int AddModifier(uint nodeHandle, IClass_ID mod_id)
         {
             try
@@ -186,9 +219,6 @@ namespace RedHaloM2B
                 IIDerivedObject dobj = RedHaloCore.Global.CreateDerivedObject(obj);
                 object objMod = RedHaloCore.Core.CreateInstance(SClass_ID.Osm, mod_id as IClass_ID);
                 IModifier mod = (IModifier)objMod;
-
-                //dobj.AddModifier(mod, null, 0);
-                //node.ObjectRef = dobj;
 
                 RedHaloCore.Core.AddModifier(node, mod, 0);
             }
@@ -233,7 +263,7 @@ namespace RedHaloM2B
                 }
             }
         }
-
+        // Calc MD5 From FileSteam
         // Delete unsupport objects
         public static void DeleteUnsupportObjects()
         {
@@ -346,6 +376,29 @@ namespace RedHaloM2B
             }
         }
 
+        //Write JSON file
+        public static bool WriteJsonFile<T>(T classType, string FileOutPath)
+        {
+            try
+            {
+                using (StreamWriter file = File.CreateText(FileOutPath))
+                using (JsonTextWriter writer = new JsonTextWriter(file))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Formatting = Formatting.Indented;
+                    serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    //serializer.NullValueHandling = NullValueHandling.Ignore;
+                    serializer.Serialize(writer, classType);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                return false;
+            }
+        }
+
         /// <summary>
         /// Get All Params Name
         /// </summary>
@@ -384,7 +437,7 @@ namespace RedHaloM2B
         }
 
         // 速度快，但是不一定能保证取得的数据是正确的，除非不会修改PB2的ID值
-        public static T GetValeByID<T>(IMtl mtl, short paramBlockID, int paramID)
+        public static T GetValueByID<T>(IMtl mtl, short paramBlockID, int paramID)
         {
             Type type = typeof(T);
 
@@ -423,7 +476,7 @@ namespace RedHaloM2B
             return default(T);
         }
 
-        public static T GetValeByID<T>(ITexmap tex, short paramBlockID, int paramID)
+        public static T GetValueByID<T>(ITexmap tex, short paramBlockID, int paramID)
         {
             Type type = typeof(T);
 
@@ -476,6 +529,16 @@ namespace RedHaloM2B
             else if (type == typeof(IIParamBlock2))
             {
                 var result = pb2.GetParamBlock2(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
+                return (T)(Object)result;
+            }
+            else if (type == typeof(IPoint3))
+            {
+                var result = pb2.GetPoint3(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
+                return (T)(Object)result;
+            }
+            else if (type == typeof(string))
+            {
+                var result = pb2.GetStr(pb2.IndextoID(paramID), 0, RedHaloCore.Forever, 0);
                 return (T)(Object)result;
             }
 
@@ -669,19 +732,17 @@ namespace RedHaloM2B
         }
 
         // Rescale whole scene
-        public static void RescaleScene()
+        public static void RescaleScene(float fac)
         {
-            var fac = (float)RedHaloCore.Global.GetSystemUnitScale(5); //5 Meter
-
             if (fac != 1f)
             {
+
 #if MAX2022 || MAX2023 || MAX2024
                 RedHaloCore.Core.RescaleWorldUnits(fac, false);
-#elif MAX2025
+#elif MAX2025 || MAX2026
                 IINodeTab iNodeTab = RedHaloCore.Global.INodeTab.Create();
                 RedHaloCore.Core.RescaleWorldUnits(fac, false, iNodeTab);
 #endif
-
                 RedHaloCore.Global.SetSystemUnitInfo(5, 1);
             }
         }
@@ -749,495 +810,453 @@ namespace RedHaloM2B
             }
         }
 
-        // 清理面数为0的物体        
+        // 清理面数为0的物体 [暂时使用maxscript实现]
         public static void CleanEmptyFaceObjects()
         {
-            var objs = GetSceneNodes().Where(
-                o =>
-                o.ObjectRef.FindBaseObject().SuperClassID == SClass_ID.Geomobject
-            );
-            var time = RedHaloCore.Core.Time;
-            var objList = new List<IINode>();
+            var ms = scripts.mxs_delete_zero_face;
+            ScriptsUtilities.ExecuteMaxScriptCommand(ms);
+        }
 
-            IINodeTab iNodeTab = RedHaloCore.Global.INodeTab.Create();
+        // 清理不支持的材质 [暂时使用maxscript实现]
+        public static void CleanupMaterials()
+        {
+            var ms = scripts.mxs;
+            ScriptsUtilities.ExecuteMaxScriptCommand(ms);
+        }
 
-            foreach (var obj in objs)
+        /// <summary>
+        /// 渲染裁切的图片，并返回新图片。<br/>
+        /// 暂时解决不了TheManager.Create(bitmapInfo)问题，就用Maxscript暂时实现
+        /// </summary>
+        /// <param name="inBitmap">IPBBitmap</param>
+        /// <param name="clipu">裁切U</param>
+        /// <param name="clipv">裁切V</param>
+        /// <param name="clipw">裁切宽度</param>
+        /// <param name="cliph">裁切高度</param>
+        /// <returns></returns>
+        public static IBitmapTex RenderAndCropImage(IPBBitmap inBitmap, float clipu, float clipv, float clipw, float cliph)
+        {
+            // 检查输入的IPBBitmap是否有效
+            if (inBitmap == null || inBitmap.Bi == null)
             {
-                IObject ob = obj.EvalWorldState(time, true).Obj;
-                int faceNum = 0;
-                int vertNum = 0;
-                RedHaloCore.Global.GetPolygonCount(time, ob, ref faceNum, ref vertNum);
+                Debug.Print("Invalid bitmap input.");
+                return null;
+            }
+            // 获取图片的真实路径
+            string filename = RedHaloTools.GetActualPath(inBitmap.Bi.Name);
 
-                if (faceNum == 0)
-                {
-                    iNodeTab.AppendNode(obj, false, 0);
-                }
+            // 检查文件名是否为空或文件不存在
+            if (string.IsNullOrEmpty(filename) ||
+                !File.Exists(filename))
+                return null;
+
+            // 获取filename的路径和后缀名
+            string dirPath = Path.GetDirectoryName(filename); //返回文件所在目录 "d:\test"
+            string extension = Path.GetExtension(filename); //扩展名 ".jpg"
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filename); // 没有扩展名的文件名 "default"
+
+            string new_prex = Guid.NewGuid().ToString("N").Substring(8, 6);
+            // 生成新的文件名
+            string newfilename = Path.Combine(dirPath, $"{fileNameWithoutExtension}-{new_prex}{extension}");
+
+            // 获取图片的宽度和高度
+            int width = (int)(inBitmap.Bi.Width * clipw);
+            int height = (int)(inBitmap.Bi.Height * cliph);
+
+            string script = "bm = undefined\n";
+            script += $"bm = Bitmaptexture filename:\"{filename}\" name:\"name_crop\" apply:on clipu:{clipu} clipv:{clipv} clipw:{clipw} cliph:{cliph}\n";
+            script += $"new_bm = renderMap bm size:[{width}, {height}] filename:\"{newfilename}\"\n";
+            script += @"save new_bm
+                       close new_bm
+                    ";
+
+            IFPValue result = RedHaloCore.Global.FPValue.Create();
+            bool runok = RedHaloCore.Global.ExecuteMAXScriptScript(script, Autodesk.Max.MAXScript.ScriptSource.Embedded, true, result, true);
+
+            if (runok)
+            {
+                // Load new bitmap
+                IBitmapTex newBitmap = RedHaloCore.Global.NewDefaultBitmapTex;
+                newBitmap.SetMapName(newfilename, true);
+
+                return newBitmap;
             }
 
-            RedHaloCore.Core.DeleteNodes(iNodeTab, true, true, true);
+            return null;
         }
 
-        public static IBitmap CreateBitmap(ITexmap tex, ushort width, ushort height, string filename)
+        /// <summary>
+        /// Cleans up unsupported textures in the specified material by processing its sub-textures.
+        /// </summary>
+        /// <remarks>This method iterates through all sub-textures of the provided material and processes
+        /// each one to ensure compatibility. If a sub-texture is <see langword="null"/>, it is skipped. Scene redraw is
+        /// temporarily disabled during the operation to improve performance and is re-enabled after processing is
+        /// complete.</remarks>
+        /// <param name="currentMtl">The material whose sub-textures will be processed. If <paramref name="currentMtl"/> is <see
+        /// langword="null"/>, the method exits without performing any operations.</param>
+        public static void CleanupMaterial(IMtl currentMtl)
         {
-            IBitmapInfo bi = RedHaloCore.Global.BitmapInfo.Create();
-            bi.SetWidth(width);
-            bi.SetHeight(height);
-            bi.SetFlags(1 << 1);
-            bi.SetType(6);
-            bi.SetName(filename);
-
-            IBitmap bitmap = RedHaloCore.Global.TheManager.Create(bi);
-            RedHaloCore.Core.RenderTexmap(tex, bitmap, 1.0f, false, false, 1.0f, 0, false);
-
-            bitmap.OpenOutput(bi);
-            bitmap.Write(bi, -2000000);
-            bitmap.Close(bi, 0);
-
-            return bitmap;
-        }
-
-        public static T RemoveUnsupportTexmap<T>(ITexmap texmap)
-        {
-            Type type = typeof(T);
-            var texName = texmap.ClassName(false);
-            GetParams(texmap);
-
-            switch (texName)
+            RedHaloCore.Core.DisableSceneRedraw();
+            if (currentMtl == null)
             {
-                case "BlendedBoxMap":
+                return;
+            }
+
+            // 遍历当前材质的所有子纹理
+            for (int i = 0; i < currentMtl.NumSubTexmaps; i++)
+            {
+                ITexmap subTexmap = currentMtl.GetSubTexmap(i);
+                if (subTexmap == null)
+                {
+                    continue; // 如果子纹理为空，跳过
+                }
+
+                var tex = ProcessTextures(subTexmap, currentMtl, i);
+                currentMtl.SetSubTexmap(i, tex);
+
+            }
+            RedHaloCore.Core.EnableSceneRedraw();
+        }
+
+        public static ITexmap ProcessTextures(ITexmap currentTexmap, IReferenceMaker parentRef, int subIndex)
+        {
+            if (currentTexmap == null)
+            {
+                return null; // 如果当前纹理为空，直接返回
+            }
+
+            var texmapTypeName = currentTexmap.ClassName(false);
+            //Debug.Print($"Processing Texmap: {texmapTypeName}, Name : {currentTexmap.Name}");
+
+            ITexmap effectiveTexmap = null;
+            ITexmap tempTexmap = null;
+            switch (texmapTypeName)
+            {
+                case "Bitmap":
+                    // 处理 Bitmap 类型的纹理
+                    effectiveTexmap = currentTexmap;  
+                    var bitmap = GetValueByID<IPBBitmap>(currentTexmap, 0, 13); // 获取位图纹理
+
+                    //var newBitmap = RenderAndCropImage(bitmap, 0.25f, 0.25f, 0.5f, 0.5f); // 裁剪位图，参数可以根据需要调整
+                    
+                    //if (newBitmap == null)
+                    //{
+                        //Debug.Print("Failed to create new bitmap texture.");
+                        //return currentTexmap; // 如果新位图创建失败，返回当前纹理
+                    //}
+
+                    // 计算文件的Hash值，用于比较场景中的纹理是否相同
+                    // 如果不相同，使用新纹理，否则使用原纹理
+                    //var fileHash = CalcMD5FromFile(newBitmap.Name);
+
+                    //textureHash.Contain(fileHash)
 
                     break;
-                case "Checker":
-                    Debug.Print("++++ CHECKER ++++");
-
-
-                    break;
-                case "Color Correction":
-
-                    break;
-                case "Color Map":
-                    Debug.Print("++++ Color Map ++++");
-
-                    break;
-                case "Composite":
-
-                    break;
-                case "Dent":
-                    //GetParams(texmap);
-                    var map1Enabled = GetValeByID<int>(texmap, 0, 4);
-                    var map2Enabled = GetValeByID<int>(texmap, 0, 5);
-
-                    // Map1
-                    var dentMap1 = GetValeByID<ITexmap>(texmap, 0, 0);
-                    var dentMap2 = GetValeByID<ITexmap>(texmap, 0, 1);
-
-                    if (dentMap1 != null && map1Enabled == 1)
-                    {
-                        return (T)(Object)dentMap1;
-                    }
-                    break;
-                case "Falloff":
-
-                    break;
-                case "Gradient":
-
-                    break;
-                case "Gradient Ramp":
-
-                    break;
-                case "Map Output Selector":
-                    /*
-                    0-0,	Texmap,	sourceMap
-                    0-1,	Int,	outputChannelIndex
-                    */
-
-                    break;
-                case "Mask":
-                    /*
-                    0-0,	Texmap,	map
-                    0-1,	Texmap,	mask
-                    0-2,	Bool2,	mapEnabled
-                    0-3,	Bool2,	maskEnabled
-                    0-4,	Bool2,	maskInverted
-                     */
-
-                    break;
-                case "Mix":
-                    /*
-                    0-0,	PcntFrac,	mixAmount
-                    0-1,	Float,	    lower
-                    0-2,	Float,	    upper
-                    0-3,	Bool2,	    useCurve
-                    0-4,	Rgba,	    color1
-                    0-5,	Rgba,	    color2
-                    0-6,	Texmap,	    map1
-                    0-7,	Texmap,	    map2
-                    0-8,	Texmap,	    mask
-                    0-9,	Bool2,	    map1Enabled
-                    0-10,	Bool2,	    map2Enabled
-                    0-11,	Bool2,	    maskEnabled
-                    0-12,	Reftarg,	output 
-                    */
-                    Debug.Print("++++ MIX ++++");
-                    //GetParams(texmap);
-
-                    break;
-                case "MultiTile":
-
-                    break;
-                case "Noise":
-
-                    break;
-                case "Output":
-                    /*
-                    0-0,	Texmap,	map1
-                    0-1,	Bool2,	map1Enabled
-                    0-2,	Reftarg,	output
-                     */
-
-                    break;
-                case "RGB Multiply":
-                    /*
-                    0-0,	Rgba,	color1
-                    0-1,	Rgba,	color2
-                    0-2,	Texmap,	map1
-                    0-3,	Texmap,	map2
-                    0-4,	Bool2,	map1Enabled
-                    0-5,	Bool2,	map2Enabled
-                    0-6,	Int,	alphaFrom
-                     */
-
-                    break;
-                case "RGB Tint":
-                    /*
-                    0-0,	Rgba,	red
-                    0-1,	Rgba,	green
-                    0-2,	Rgba,	blue
-                    0-3,	Texmap,	map1
-                    0-4,	Bool2,	map1Enabled
-                     */
-
-                    break;
-                case "Smoke":
-
-                    break;
-                case "Speckle":
-                    /*
-                    0 - 0,	Float,	    size
-                    0 - 1,	Rgba,	    color1
-                    0 - 2,	Rgba,	    color2
-                    0 - 3,	Texmap,	    map1
-                    0 - 4,	Texmap,	    map2
-                    0 - 5,	Bool2,	    map1On
-                    0 - 6,	Bool2,	    map2On
-                    0 - 7,	Reftarg,	coords
-                    */
-                    break;
-                case "Splat":
-                    /*
-                    0-0,	Float,	    size
-                    0-1,	Int,	    iterations
-                    0-2,	Float,	    threshold
-                    0-3,	Rgba,	    color1
-                    0-4,	Rgba,	    color2
-                    0-5,	Texmap,	    map1
-                    0-6,	Texmap,	    map2
-                    0-7,	Bool2,	    map1On
-                    0-8,	Bool2,	    map2On
-                    0-9,	Reftarg,	coords 
-                    */
-
-                    break;
-                case "Stucco":
-
-                    break;
-                case "Tiles":
-
-                    break;
-                case "Vector Displacement":
-
-                    break;
-                case "Vertex Color":
-
-                    break;
-                case "Waves":
-
-                    break;
-
-                #region VRAY Textures
-
+                
                 case "VRayBitmap":
+                    // 处理 Bitmap 类型的纹理
+                    effectiveTexmap = currentTexmap;
 
                     break;
-                case "VRayBump2Normal":
-
+                
+                case "CoronaBitmap":
+                    // 处理 Bitmap 类型的纹理
+                    effectiveTexmap = currentTexmap;
+                    
                     break;
-                case "VRayColor":
+                
+                case "Map Output Selector": // Advanced Wood Textures
+                case "BlendedBoxMap":
+                case "Camera_Map_Per_Pixel":
+                case "Cellular":
+                case "Dent":
+                case "Output":
+                case "RGB Tint":
 
-                    break;
-                case "VRayColor2Bump":
-
-                    break;
-                case "VRayCompTex":
-
-                    break;
-                case "VRayDirt":
-
-                    break;
-                case "VRayEdgesTex":
-
-                    break;
                 case "VRayMultiSubTex":
-
-                    break;
-                case "VRayNormalMap":
-
-                    break;
-                case "VRayOCIO":
-
-                    break;
-                case "VRaySoftbox":
-
-                    break;
                 case "VRayTriplanarTex":
-
-                    break;
                 case "VRayUserColor":
-
-                    break;
                 case "VRayUserScalar":
 
-                    break;
-                case "VRayUVWRandomizer":
-
-                    break;
-                #endregion
-
-                #region Corona Textures
-                case "CoronaAO":
-                    break;
-                case "CoronaBitmap":
-                    break;
-                case "CoronaBumpConverter":
-                    break;
-                case "CoronaColor":
-                    break;
-                case "CoronaColorCorrect":
-                    break;
-                case "CoronaCurvature":
-                    break;
-                case "CoronaDistance":
-                    break;
                 case "CoronaEdgeMap":
-                    break;
-                case "CoronaFrontBack":
-                    break;
-                case "CoronaMappingRandomizer":
-                    break;
-                case "CoronaMix":
-                    break;
                 case "CoronaMultiMap":
-                    break;
-                case "CoronaNormal":
-                    break;
-                case "CoronaRaySwitch":
-                    break;
-                case "CoronaRoundEdges":
-                    break;
-                case "CoronaSelect":
-                    break;
-                case "CoronaTileMap":
-                    break;
-                case "CoronaTonemapControl":
-                    break;
+                case "CoronaRaySwitch": // Corona Ray Switch Texture
                 case "CoronaTriplanar":
+                case "CoronaTonemapControl":
+                    effectiveTexmap = ProcessTextures(currentTexmap.GetSubTexmap(0), currentTexmap, 0);
                     break;
+
+                case "Checker":
+                case "ColorCorrection":
+                case "Falloff":
+                case "Color Correction":
+                case "Color Map":
+                case "Composite":
+                case "Mix":
+                case "Mask":
+                case "MultiTile":
+                case "RGB Multiply":
+                case "Tiles": //Brick Textures
+                
+                case "VRayBump2Normal":
+                case "VRayColor":
+                case "VRayColor2Bump":
+                case "VRayCompTex":
+                case "VRayDirt":
+                case "VRayNormalMap":
+
+                case "CoronaAO":
+                case "CoronaBumpConverter":                
+                case "CoronaColorCorrect":
+                case "CoronaFrontBack":
+                case "CoronaMix":
+                case "CoronaNormal":
+                //case "CoronaRaySwitch": //暂时只取第一个纹理
+                case "CoronaRoundEdges":
+                case "CoronaTileMap":
                 case "CoronaWire":
+                    for (int i = 0; i < currentTexmap.NumSubTexmaps; i++)
+                    {
+                        tempTexmap = currentTexmap.GetSubTexmap(i); // 获取当前纹理的子纹理
+                        tempTexmap = ProcessTextures(tempTexmap, currentTexmap, i); // 递归处理子纹理
+                        currentTexmap.SetSubTexmap(i, tempTexmap); // 更新当前纹理的子纹理
+                    }
+                    effectiveTexmap = currentTexmap; // 返回当前纹理
                     break;
-                #endregion
+
+                case "Gradient":
+                    break;
+                case "Gradient Ramp":
+                    break;
+
+                case "Vertex Color":
+                case "VRayEdgesTex":
+                case "CoronaColor":
+                    effectiveTexmap = currentTexmap; // 直接返回当前纹理
+                    break;
+
+                case "VRaySky":
+                    break;
+
+                case "CoronaSelect":                    
+                    var selectIndex = GetValueByID<int>(currentTexmap, 0, 2);
+                    var pb = currentTexmap.GetParamBlock(0);
+                    tempTexmap = pb.GetTexmap(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
+                    effectiveTexmap = ProcessTextures(tempTexmap, currentTexmap, 0); // 递归处理选中的纹理
+                    break;
 
                 default:
+                    effectiveTexmap = null; // 对于不支持的纹理类型，设置为 null
                     break;
             }
-
-            return default;
+            return effectiveTexmap; // 返回处理后的纹理
         }
 
-        public static void CleanupMtl(IMtl mtl)
+        // 查看插件是否安装
+        public static bool IsPluginInstalled(string pluginName)
         {
-            var mtlType = mtl.ClassName(false);
-            Debug.Print(mtlType);
-            //GetParams(mtl);
-
-            switch (mtlType)
+            // 提前处理输入参数，如果pluginName为null或空，则认为插件未安装
+            if (string.IsNullOrEmpty(pluginName))
             {
-                case "VRayBlendMtl":
-
-                    break;
-                case "VRay2SidedMtl":
-                    /*
-                    0-0,	Mtl,	frontMtl
-                    0-1,	Mtl,	backMtl
-                    0-2,	Float,	
-                    0-3,	Rgba,	translucency
-                    0-4,	Bool2,	backMtlOn
-                    0-5,	Texmap,	texmap_translucency
-                    0-6,	Float,	texmap_translucency_multiplier
-                    0-7,	Bool2,	texmap_translucency_on
-                    0-8,	Bool2,	force1SidedSubMtls
-                    0-9,	Bool2,	mult_by_front_diffuse 
-                    */
-                    var frontMtl = GetValeByID<IMtl>(mtl, 0, 0);
-
-                    break;
-                case "VRayOverrideMtl":
-
-                    break;
-                case "VrayMtlWrapper":
-
-                    break;
-                case "DoubleSided":
-
-                    break;
-                case "CoronaRaySwitchMtl":
-
-                    break;
-                case "CoronaLayeredMtl":
-
-                    break;
-                default:
-                    break;
+                return false;
             }
+
+            var dl = RedHaloCore.Core.DllDir;
+
+            // 处理 RedHaloCore.Core.DllDir 可能为 null 的情况
+            if (dl == null)
+            {
+                return false;
+            }
+
+            // 循环遍历插件描述
+            for (int i = 0; i < dl.Count; i++)
+            {
+                var dll = dl.GetDllDescription(i);
+
+                // 处理 GetDllDescription 返回 null 或 Description 属性为 null 的情况
+                if (dll == null || string.IsNullOrEmpty(dll.Description))
+                {
+                    continue; // 跳过当前项
+                }
+
+                // 使用 IndexOf 和 StringComparison.OrdinalIgnoreCase 进行不区分大小写的查找
+                // 这是比 ToLower().Contains() 更高效且推荐的方式
+                if (dll.Description.IndexOf(pluginName, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    // 找到匹配项，立即返回 true
+                    return true;
+                }
+            }
+
+            // 循环结束都没有找到匹配项，返回 false
+            return false;
         }
 
+        /// <summary>
+        /// 收集场景中所有位图文件的哈希值和路径
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, string> CollectAllBitmaps()
+        {
+            string script = @"(
+                mapfiles=#()
+                fn addmap mapfile = (
+	                local mapfileN = mapfile as name
+	                local index = finditem mapfiles mapfileN
+	                if index == 0 do append mapfiles mapfileN
+                )
+                enumeratefiles addmap
+                mapfiles
+            )";
+
+            IFPValue result = RedHaloCore.Global.FPValue.Create();
+            RedHaloCore.Global.ExecuteMAXScriptScript(script, Autodesk.Max.MAXScript.ScriptSource.Embedded, true, result, true);            
+
+            Dictionary<string , string> fileSteamHash = new Dictionary<string, string>();
+
+            for (int i = 0; i < result.STab.Count; i++)
+            {
+                // 计算文件流的哈希值
+                var fileHash = CalcMD5FromFile(result.STab[i]);
+                
+                // 添加到字典中
+                if (fileSteamHash.ContainsKey(fileHash))
+                {
+                    // 如果哈希值已经存在，则跳过
+                    continue;
+                }
+
+                fileSteamHash.Add(fileHash, result.STab[i]);
+            }
+
+            return fileSteamHash;
+        }
+        
         public static void Test()
         {
+            // 图片的Hash值，字典
+            Dictionary<string, string> textureHash = new Dictionary<string, string>();
+            // 获取场景中所有的贴图
+            textureHash = RedHaloTools.CollectAllBitmaps();            
+
             var mats = MaterialUtils.GetSceneMaterials().ToList();
             var mtl = mats.Where(ob => ob.Name == "01").First();
-            //CleanupMtl(mtl);
-            Debug.Print($"{mtl.ClassID.PartA.ToString("X")} / {mtl.ClassID.PartB.ToString("X")}");
+            CleanupMaterial(mtl);
+            //Debug.Print($"{mtl.ClassName(false)}");
+            //Debug.Print($"{mtl.ClassID.PartA.ToString("X")} / {mtl.ClassID.PartB.ToString("X")}");
 
-            var index = 0;
-            // Export Normal material
-            var normalMtl = 10;
-            for (int i = 0; i < normalMtl; i++)
-            {
-
-            }
-
-            var lightMtl = 10;
-            var doubleMtl = 10;
-
-            var diffTex = RedHaloTools.GetValeByID<ITexmap>(mtl, 0, 12);
-
-            if(diffTex != null)
-            {
-                   
-            }
-
-            /*
-            int numParams = anim.NumSubs;
-            for (int i = 0; i < numParams; i++)
-            {
-                string paramName = anim.SubAnimName(i);
-                IAnimatable subAnim = anim.SubAnim(i);
-
-                if (paramName == "Parameters")
-                {
-                    if (subAnim is IIParamBlock pb)
-                    {                                            
-                        int count = pb.NumParams;
-                        for (int j = 0; j < count; j++)
-                        {
-                            var nodeName = pb.SubAnimName(j);
-                            ParamType type = pb.GetParameterType(j);
-                            string valueStr = "";
-
-                            switch (type)
-                            {
-                                case ParamType.Int:
-                                    int intValue = pb.GetInt(j, 0);
-                                    valueStr = intValue.ToString();
-                                    break;
-                                case ParamType.Float:
-                                    float floatValue = pb.GetFloat(j, 0);
-                                    valueStr = floatValue.ToString();
-                                    break;
-                                case ParamType.Rgba:
-                                    IColor colorValue = pb.GetColor(j, 0);
-                                    valueStr = $"{colorValue.R:F2},{colorValue.G},{colorValue.B}";
-                                    break;
-                                case ParamType.Point3:
-                                    var p = pb.GetPoint3(j, 0);
-                                    valueStr = $"{p.X:F2},{p.Y:F2},{p.Z:F2}";
-                                    break;
-                                default:
-                                    valueStr = "Unknown";
-                                    break;
-                            }
-
-                            Debug.Print($"Para {j} {nodeName}: Type: {type} - Value: {valueStr}");                                    
-                        }
-
-                    }
-                }
-            }
-            */
-
-            // Export Normal material
-            var DoubleMaterial = Exporter.ExportMaterial(mtl, 0);
-
-            // Export Light materials
-            //var mtlpbr = Exporter.ExportLightMaterial(mtl, 0);
-
-            // Mutil-Materials
-            //var subMaterial = null;
-            //var DoubleMaterial = Exporter.ExportDoubleMaterial(mtl, 0);
-
-            // Export Override Materil
-            //var DoubleMaterial = Exporter.ExportOverrideMaterial(mtl, 0);
-
-            // Export Blend Material
-            //var DoubleMaterial = Exporter.ExportBlendMaterial(mtl, 0);
-
-            string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
-            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL1.json");
-
-            // 使用 JsonTextWriter 将 JSON 写入文件
-            using (StreamWriter file = File.CreateText(outputFileName))
-            using (JsonTextWriter writer = new JsonTextWriter(file))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                serializer.Serialize(writer, DoubleMaterial);
-            }
+            //GetParams(mtl);
         }
 
-        public static void ExportMtl()
+        public static void ExportMtl(string tempOutDirectory)
         {
-            var b = MaterialUtils.GetSceneMaterials();
-
-            string tempOutDirectory = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RH_M2B_TEMP");
-            string outputFileName = Path.Combine(tempOutDirectory, "RHM2B_MATERIAL.xml");
+            var materials = MaterialUtils.GetSceneMaterials();
+            string outputFileName = System.IO.Path.Combine(tempOutDirectory, "RHM2B_MATERIAL.json");
 
             RedHaloScene redhaloScene = new(tempOutDirectory);
+            var materialIndex = 0;
 
-            var index = 0;
-            foreach (var material in b)
+            var basePbrMaterialType = new HashSet<string> {
+                   "VRayMtl", "CoronaPhysicalMtl","\rCoronaPhysicalMtl", "CoronaLegacyMtl", "Standard(Legacy)", "StandardMaterial", "VRayCarPaintMtl", "VRayCarPaintMtl2"
+            };
+
+            var lightMaterialType = new HashSet<string> {
+                   "VRayLightMtl", "CoronaLightMtl"
+            };
+
+            // Single Material
+            foreach (var material in materials)
             {
-                if (material.ClassName(false) != "Multi/Sub-Object")
-                {
-                    //Debug.Print(material.Name);
-                    var redHaloPBRMtl = Exporter.ExportMaterial(material, index);
+                var materialType = material.ClassName(false);
 
-                    redhaloScene.Materials.Add(redHaloPBRMtl);
+                if (basePbrMaterialType.Contains(materialType))
+                {
+                    var redHaloPBRMtl = Exporter.ExportMaterial(material, materialIndex);
+                    if (redHaloPBRMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloPBRMtl);
+                    }
                 }
-                index++;
+                else if (lightMaterialType.Contains(materialType))
+                {
+                    var redHaloLightMtl = Exporter.ExportLightMaterial(material, materialIndex);
+                    if (redHaloLightMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloLightMtl);
+                    }
+                }
+
+                if (materialType == "CoronaSelectMtl")
+                {
+                    var selectIndex = RedHaloTools.GetValueByID<int>(material, 0, 2);
+                    var pb = material.GetParamBlock(0);
+                    var sub = pb.GetMtl(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
+                }
+
+                materialIndex++;
             }
 
-            #region WRITE XML FILE
-            var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
+            // mutli materials
+            foreach (var material in materials)
+            {
+                var materialType = material.ClassName(false);
+
+                if (materialType == "VRayBlendMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayBlendMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "CoronaLayerMtl")
+                {
+                    var redHaloMtl = Exporter.ExportCoronaLayerMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "Blend")
+                {
+                    var redHaloMtl = Exporter.ExportDoubleMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "VRay2SidedMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayDoubleMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "VRayOverrideMtl")
+                {
+                    var redHaloMtl = Exporter.ExportVRayOverrideMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+                else if (materialType == "CoronaRaySwitchMtl")
+                {
+                    var redHaloMtl = Exporter.ExportCoronaRaySwitchMtl(material, materialIndex);
+                    if (redHaloMtl != null)
+                    {
+                        redhaloScene.Materials.Add(redHaloMtl);
+                    }
+                }
+
+                materialIndex++;
+            }
+
+            #region WRITE FILE
+            //var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
+            var writeSucess = RedHaloTools.WriteJsonFile<RedHaloScene>(redhaloScene, outputFileName);
             #endregion
         }
 
@@ -1285,26 +1304,10 @@ namespace RedHaloM2B
             RedHaloCore.Core.ExplodeNodes(iTab);
         }
 
-        // IColor to string
-        public static string IColorToString(IColor color, bool useFourNum = false)
-        {
-            if (useFourNum)
-            {
-                return $"{color.R},{color.G},{color.B},1";
-            }
-
-            return $"{color.R},{color.G},{color.B}";
-        }
-
-        public static string IColorToString(IAColor color)
-        {
-            return $"{color.R},{color.G},{color.B},{color.A}";
-        }
-
         // Write Log
         public static void WriteLog(string log)
         {
-            string logFilename = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RHM2B_log.log");
+            string logFilename = System.IO.Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "RHM2B_log.log");
             using (StreamWriter w = File.AppendText(logFilename))
             {
                 w.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd")} {DateTime.Now.TimeOfDay}]: {log}");
@@ -1339,38 +1342,101 @@ namespace RedHaloM2B
             }
         }
 
-        // Cleanup unsupport textures
-        public static ITexmap CleanupTexture(ITexmap texmap)
+        public static bool CopyFiles(string oldfile, string newPath)
         {
-            if (texmap == null)
-                return null;
-
-            var texType = texmap.ClassName(false);
-
-            switch (texType)
+            var fileExt = System.IO.Path.GetExtension(oldfile);
+            var newFile = System.IO.Path.Combine(newPath, System.IO.Path.GetFileName(oldfile));
+            try
             {
-                case "Cellular":
-
-                    break;
-                default:
-                    break;
+                if (newFile != oldfile)
+                {
+                    File.Copy(oldfile, newFile, true);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
+            catch (Exception ex)
+            {
+                // Print error log
 
-            return null;
+                Debug.Print(ex.ToString());
+                return false;
+            }
         }
-    
 
-        public static void GetBitmapCroppingInfo(IBitmap bitmap)
+        // 导出USD文件
+        public static bool ExportUSDFile(string export_file)
         {
+            string usdOption = "" +
+                "usd_options = USDExporter.createOptions()\n" +
+                "              usd_options.Meshes = True\n" +
+                "              usd_options.Shapes = True\n" +
+                "              usd_options.Cameras = False\n" +
+                "              usd_options.Materials = True\n" +
+                "              usd_options.FileFormat = #Binary\n" +
+                "              usd_options.upAxis = #Z\n" +
+                "              usd_options.Normals = #asPrimvar\n" +
+                "              usd_options.PreserveEdgeOrientation = True\n" +
+                "              usd_options.TimeMode = #animationRange\n" +
+                "              USDExporter.UIOptions = usd_options";
 
+            ScriptsUtilities.ExecuteMaxScriptCommand(usdOption);
+
+            var export = RedHaloCore.Core.ExportToFile(export_file, true, 0, null);
+
+            return export;
         }
 
-        public static IBitmap CropBitmap(IBitmap bitmap)
+        // 导出FBX文件
+        public static bool ExportFBXFile(string export_file)
         {
-            string realFilePath = RedHaloTools.GetActualPath(bitmap.BitmapInfo.Name);
+            string FbxOption = "" +
+                "            pluginManager.loadClass FBXEXPORTER\n" +
+                "            FBXExporterSetParam \"SmoothingGroups\" false\n" +
+                "            FBXExporterSetParam \"NormalsPerPoly\" false\n" +
+                "            FBXExporterSetParam \"TangentSpaceExport\" false\n" +
+                "            FBXExporterSetParam \"SmoothMeshExport\" true\n" +
+                "            FBXExporterSetParam \"Preserveinstances\" true\n" +
+                "            FBXExporterSetParam \"SelectionSetExport\" false\n " +
+                "            FBXExporterSetParam \"Triangulate\" false\n" +
+                "            FBXExporterSetParam \"Animation\" true\n" +
+                "            FBXExporterSetParam \"Removesinglekeys\" true\n" +
+                "            FBXExporterSetParam \"Cameras\" false\n" +
+                "            FBXExporterSetParam \"Lights\" false\n" +
+                "            FBXExporterSetParam \"EmbedTextures\" false\r\n" +
+                "            FBXExporterSetParam \"AxisConversionMethod\" \"None\"\n" +
+                "            FBXExporterSetParam \"UpAxis\" \"Z\"\n " +
+                "            FBXExporterSetParam \"ShowWarnings\" false\n" +
+                "            FBXExporterSetParam \"GenerateLog\" false\n " +
+                "            FBXExporterSetParam \"ASCII\" false\n" +
 
+#if MAX2026 || MAX2025 || MAX2024 || MAX2023 || MAX2022 || MAX2021 || MAX2020
 
-            return null;
+                "            FBXExporterSetParam \"FileVersion\" \"FBX202000\"\n" +
+#elif MAX2019
+                "            -- 3dsmax 2019\r\n" +
+                "            FBXExporterSetParam \"FileVersion\" \"FBX201900\"\n" +
+#elif MAX2018
+                "            -- 3dsmax 2018\r\n" +
+                "            FBXExporterSetParam \"FileVersion\" \"FBX201800\"\n" +
+#elif MAX2017
+                "            -- 3dsmax 2017\r\n" +
+                "            FBXExporterSetParam \"FileVersion\" \"FBX201700\"\n" +
+#else
+                "            -- other vesions\r\n" +
+                "            FBXExporterSetParam \"FileVersion\" \"FBX201600\"\n" +
+#endif
+
+                "        )";
+
+            ScriptsUtilities.ExecuteMaxScriptCommand(FbxOption);
+
+            var export = RedHaloCore.Core.ExportToFile(export_file, true, 0, null);
+
+            return export;
         }
     }
 }

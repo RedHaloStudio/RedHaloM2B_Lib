@@ -9,11 +9,13 @@ IF %2=="Debug" GOTO OnDebug
 IF %2=="Release" GOTO OnRelease
 
 :OnDebug
-SET dest_dir=D:\APP\DLL
+SET dest_dir="C:\Program Files\Autodesk\3ds Max 2023\bin\assemblies"
+rem SET dest_dir=D:\APP\DLL
 GOTO CopyFiles
 
 :OnRelease
-SET dest_dir=D:\APP\DLL
+rem SET dest_dir=D:\APP\DLL
+SET dest_dir="C:\Program Files\Autodesk\3ds Max 2023\bin\assemblies"
 rem "%max_location%bin\assemblies"
 GOTO CopyFiles
 

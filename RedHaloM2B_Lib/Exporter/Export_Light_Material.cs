@@ -12,10 +12,10 @@ namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloLightMtl ExportLightMaterial(IMtl material, int materialIndex)
+        public static RedHaloLightMtl ExportLightMaterial(IMtl material)
         {
             string sourceName = material.Name;
-            string newName = $"material_light_{materialIndex:D4}";
+            string newName = $"M_{RedHaloTools.CalcMD5FromString(sourceName)}";
 
             IColor maxClr = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
             ITexmap texmap = null;
@@ -26,7 +26,6 @@ namespace RedHaloM2B
                 SourceName = sourceName,
                 Type = material.ClassName(false),
             };
-            Debug.Print($"{material.ClassName(false)}");
 
             switch (material.ClassName(false))
             {

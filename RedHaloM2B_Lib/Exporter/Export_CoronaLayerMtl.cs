@@ -6,10 +6,10 @@ namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloBlendMtl ExportCoronaLayerMtl(IMtl inMaterial, int materialIndex)
+        public static RedHaloBlendMtl ExportCoronaLayerMtl(IMtl inMaterial)
         {
-            string materialName = $"material_{materialIndex:D5}";
             string materialOriginalName = inMaterial.Name;
+            string materialName = $"M_{RedHaloTools.CalcMD5FromString(materialOriginalName)}";
 
             string materialType = inMaterial.ClassName(false);
 
@@ -20,7 +20,7 @@ namespace RedHaloM2B
             {
                 Name = materialName,
                 SourceName = materialOriginalName,
-                Type = "BlendMaterial",
+                Type = "blend_material",
 
                 Layers = [],
             };

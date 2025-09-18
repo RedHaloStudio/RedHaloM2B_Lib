@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Media.Media3D;
 
 namespace RedHaloM2B
 {
@@ -52,6 +53,11 @@ namespace RedHaloM2B
                 OutputPath = tempOutDirectory,
                 LogPath = systemTempDirectory,
             };
+
+            GlobalSettings.OutputPath = appSettings.OutputPath;
+            GlobalSettings.LogPath = appSettings.LogPath;
+            GlobalSettings.ExportFormat = fileFormat;
+            GlobalSettings.SceneScale = (float)RedHaloCore.Global.GetSystemUnitScale(5); //5 Meter
 
             // 尝试删除log文件
             File.Delete(logFilename);
@@ -137,7 +143,7 @@ namespace RedHaloM2B
 
             redhaloScene.Settings = new RedHaloSettings
             {
-                WorldUnit = (float)RedHaloCore.Global.GetSystemUnitScale(5), //5 Meter
+                WorldUnit = GlobalSettings.SceneScale, //(float)RedHaloCore.Global.GetSystemUnitScale(5), //5 Meter
                 ImageWidth = RedHaloCore.Core.RendWidth,
                 ImageHeight = RedHaloCore.Core.RendHeight,
                 ImagePixelAspect = RedHaloCore.Core.ImageAspRatio,
@@ -159,7 +165,6 @@ namespace RedHaloM2B
             };
 
             // 设置日志文件
-
             #endregion
 
             // 缩放整个场景（以米为基础单位），匹配Blender单位尺寸
@@ -294,12 +299,11 @@ namespace RedHaloM2B
 
             #region EXPORT MATERIALS
 
+            RedHaloTools.WriteLog($"=========导出材质开始=========");
             // 清理场景中不支持的材质
             RedHaloTools.CleanupMaterials();
-
-            var materials = MaterialUtils.GetSceneMaterials();
-
-            var materialIndex = 0;
+            
+            var materials = MaterialUtils.GetSceneMaterials().ToList();
 
             var basePbrMaterialType = new HashSet<string> {
                    "VRayMtl", "CoronaPhysicalMtl","\rCoronaPhysicalMtl", "CoronaLegacyMtl", "Standard (Legacy)", "StandardMaterial", "VRayCarPaintMtl", "VRayCarPaintMtl2"
@@ -308,37 +312,38 @@ namespace RedHaloM2B
             var lightMaterialType = new HashSet<string> {
                    "VRayLightMtl", "CoronaLightMtl"
             };
+            
+            var multiMaterialType = new HashSet<string> {
+                   "VRayBlendMtl", "CoronaLayerMtl", "Blend", "VRay2SidedMtl", "VRayOverrideMtl", "CoronaRaySwitchMtl", "Double Sided"
+            };
+
+            // 普通材质
+            List<IMtl> singleMaterials = materials.Where(m => basePbrMaterialType.Contains(m.ClassName(false))).ToList();
+            materials.RemoveAll(m => basePbrMaterialType.Contains(m.ClassName(false)));
+
+            // 灯光材质
+            List<IMtl> LightMaterials = materials.Where(m => lightMaterialType.Contains(m.ClassName(false))).ToList();
+            materials.RemoveAll(m => lightMaterialType.Contains(m.ClassName(false)));
+
+            // 复合材质/多层材质
+            List<IMtl> multiMaterials = materials.Where(m => multiMaterialType.Contains(m.ClassName(false))).ToList();
+            materials.RemoveAll(m => multiMaterialType.Contains(m.ClassName(false)));
 
             // Single Material
-            foreach (var material in materials)
+            foreach (var material in singleMaterials)
             {
                 // 清理不支持的纹理
                 RedHaloTools.CleanupMaterial(material);
-
                 var materialType = material.ClassName(false);
                 var originalName = material.Name;
 
-                RedHaloTools.WriteLog($"材质 ：{originalName}");
-
                 try
                 {
-                    if (basePbrMaterialType.Contains(materialType))
+                    var redHaloPBRMtl = Exporter.ExportMaterial(material);
+                    if (redHaloPBRMtl != null)
                     {
-                        var redHaloPBRMtl = Exporter.ExportMaterial(material, materialIndex);
-                        if (redHaloPBRMtl != null)
-                        {
-                            redHaloPBRMtl.Type = "pbr_material";
-                            redhaloScene.Materials.Add(redHaloPBRMtl);
-                        }
-                    }
-                    else if (lightMaterialType.Contains(materialType))
-                    {
-                        var redHaloLightMtl = Exporter.ExportLightMaterial(material, materialIndex);
-                        if (redHaloLightMtl != null)
-                        {
-                            redHaloLightMtl.Type = "light_material";
-                            redhaloScene.Materials.Add(redHaloLightMtl);
-                        }
+                        redHaloPBRMtl.Type = "pbr_material";
+                        redhaloScene.Materials.Add(redHaloPBRMtl);
                     }
 
                     //if (materialType == "CoronaSelectMtl")
@@ -348,76 +353,106 @@ namespace RedHaloM2B
                     //    var sub = pb.GetMtl(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
                     //}
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     RedHaloTools.WriteLog($"错误材质名 ：{material.Name}，原始材质名：{originalName}, 类型：{materialType}");
+                    RedHaloTools.WriteLog($"ERROR INFO:\n{ex.Message}");
                 }
-
-                materialIndex++;
             }
 
-            RedHaloTools.WriteLog($"双面材质开始。。。");
+            // Light Material
+            foreach (var material in LightMaterials)
+            {
+                // 清理不支持的纹理
+                RedHaloTools.CleanupMaterial(material);
+
+                var materialType = material.ClassName(false);
+                var originalName = material.Name;
+
+                try
+                {
+                    var redHaloLightMtl = Exporter.ExportLightMaterial(material);
+                    if (redHaloLightMtl != null)
+                    {
+                        redHaloLightMtl.Type = "light_material";
+                        redhaloScene.Materials.Add(redHaloLightMtl);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    RedHaloTools.WriteLog($"错误材质名 ：{material.Name}，原始材质名：{originalName}, 类型：{materialType}");
+                    RedHaloTools.WriteLog($"ERROR INFO:\n{ex.Message}");
+                }
+            }
 
             // mutli materials
-            foreach (var material in materials)
+            foreach (var material in multiMaterials)
             {
                 var materialType = material.ClassName(false);
 
-                RedHaloTools.WriteLog($"材质 ：{material.Name}，类型：{materialType}");
+                //RedHaloTools.WriteLog($"材质 ：{material.Name}，类型：{materialType}");
 
-                if (materialType == "VRayBlendMtl")
+                try
                 {
-                    var redHaloMtl = Exporter.ExportVRayBlendMtl(material, materialIndex);
-                    if (redHaloMtl != null)
+                    if (materialType == "VRayBlendMtl")
                     {
-                        redhaloScene.Materials.Add(redHaloMtl);
+                        var redHaloMtl = Exporter.ExportVRayBlendMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
                     }
-                }
-                else if (materialType == "CoronaLayerMtl")
+                    else if (materialType == "CoronaLayerMtl")
+                    {
+                        var redHaloMtl = Exporter.ExportCoronaLayerMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
+                    }
+                    //else if (materialType == "Blend")
+                    else if (materialType == "Double Sided")
+                    {
+                        var redHaloMtl = Exporter.ExportDoubleMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
+                    }
+                    else if (materialType == "VRay2SidedMtl")
+                    {
+                        var redHaloMtl = Exporter.ExportVRayDoubleMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
+                    }
+                    else if (materialType == "VRayOverrideMtl")
+                    {
+                        var redHaloMtl = Exporter.ExportVRayOverrideMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
+                    }
+                    else if (materialType == "CoronaRaySwitchMtl")
+                    {
+                        var redHaloMtl = Exporter.ExportCoronaRaySwitchMtl(material);
+                        if (redHaloMtl != null)
+                        {
+                            redhaloScene.Materials.Add(redHaloMtl);
+                        }
+                    }
+                }catch (Exception ex)
                 {
-                    var redHaloMtl = Exporter.ExportCoronaLayerMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
+                    RedHaloTools.WriteLog($"错误材质名 ：{material.Name}，类型：{materialType}");
+                    RedHaloTools.WriteLog($"ERROR INFO:\n{ex.Message}");
                 }
-                else if (materialType == "Blend")
-                {
-                    var redHaloMtl = Exporter.ExportDoubleMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "VRay2SidedMtl")
-                {
-                    var redHaloMtl = Exporter.ExportVRayDoubleMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "VRayOverrideMtl")
-                {
-                    var redHaloMtl = Exporter.ExportVRayOverrideMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "CoronaRaySwitchMtl")
-                {
-                    var redHaloMtl = Exporter.ExportCoronaRaySwitchMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-
-                materialIndex++;
             }
 
             #endregion
+            RedHaloTools.WriteLog($"=========导出材质结束=========");
 
             #region WRITE XML FILE / JSON FILE
             //var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);

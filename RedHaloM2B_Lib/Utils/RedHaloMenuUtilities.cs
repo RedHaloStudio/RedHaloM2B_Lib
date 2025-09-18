@@ -74,6 +74,5 @@ namespace RedHaloM2B
             global.ReleaseIMenu(customMenu);
             customMenu = null;
         }
-
     }
 }

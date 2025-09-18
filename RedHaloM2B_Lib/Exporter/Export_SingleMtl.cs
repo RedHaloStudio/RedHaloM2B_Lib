@@ -19,10 +19,12 @@ namespace RedHaloM2B
             TRANSLUCENT = 7
         }
 
-        public static RedHaloPBRMtl ExportMaterial(IMtl material, int materialIndex)
+        public static RedHaloPBRMtl ExportMaterial(IMtl material)
         {
             string sourceName = material.Name;
-            string newName = $"material_{materialIndex:D5}";
+            string md5 = RedHaloTools.CalcMD5FromString(sourceName);
+            //string newName = $"material_{materialIndex:D5}";
+            string newName = $"M_{md5}";
 
             // set new name
             material.Name = newName;
@@ -46,11 +48,6 @@ namespace RedHaloM2B
                 Type = material.ClassName(false),
             };
             var materialType = material.ClassName(false);
-
-            if (materialType == "VRayMtl")
-            {
-
-            }
             switch (material.ClassName(false))
             {
                 case "VRayMtl":
@@ -166,7 +163,6 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-
                     #region Metallic
 
                     /*
@@ -186,7 +182,6 @@ namespace RedHaloM2B
                         PBRMtl.MetallicGroup.MetallicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
-
                     #region Opacity
 
                     PBRMtl.OpacityGroup.Opacity = RedHaloTools.GetValueByID<float>(material, 3, 40) / 100.0f;
@@ -198,7 +193,6 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-
                     #region Subsurface
 
                     if (sss_on == 6)
@@ -234,7 +228,6 @@ namespace RedHaloM2B
                         }
                     }
                     #endregion
-
                     #region Anisotropic
                     PBRMtl.AnisotropicGroup.Anisotropic = RedHaloTools.GetValueByID<float>(material, 1, 1);
                     PBRMtl.AnisotropicGroup.AnisotropicRotation = (float)(RedHaloTools.GetValueByID<float>(material, 1, 2) % 360 / 360);
@@ -316,7 +309,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-
+                    
                     #region Sheen
                     maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 52);
 
@@ -338,7 +331,7 @@ namespace RedHaloM2B
                         texmap = null;
                     }
                     #endregion
-
+                    
                     #region Emission
 
                     maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 5);
@@ -359,7 +352,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-
+                    
                     #region ThinFilm
 
                     if (RedHaloTools.GetValueByID<int>(material, 0, 61) == 1)
@@ -386,7 +379,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-
+                    
                     #region TranslucentColor
 
                     #endregion

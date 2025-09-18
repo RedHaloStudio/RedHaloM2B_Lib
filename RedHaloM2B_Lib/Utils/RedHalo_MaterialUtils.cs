@@ -259,10 +259,8 @@ namespace RedHaloM2B.RedHaloUtils
             IColor maxRGB = RedHaloCore.Global.Color.Create(0.8, 0.8, 0.8);
             IAColor maxRGBA = RedHaloCore.Global.AColor.Create(0.8, 0.8, 0.8, 1);
             float amount = 0.0f;
-            IBitmapTex new_bm = null;
 
             //Debug.Print($"======{texType.ToUpper()}======");
-            
             var ti = new TexmapInfo()
             {
                 Name = tex.Name,
@@ -275,7 +273,7 @@ namespace RedHaloM2B.RedHaloUtils
                 {
                     ti.subTexmapInfo.Add(key, ExportTexmap(subtexmap));
                 }
-            }   
+            }
 
             switch (texType)
             {
@@ -718,9 +716,10 @@ namespace RedHaloM2B.RedHaloUtils
                     maxRGB = RedHaloTools.GetValueByID<IColor>(tex, 0, 4);
                     ti.Properties.Add("unoccluded_color", new[] { maxRGB.R, maxRGB.G, maxRGB.B, 1 });
 
-                    
                     // radius
-                    ti.Properties.Add("radius", RedHaloTools.GetValueByID<float>(tex, 0, 0));
+                    float fac = GlobalSettings.SceneScale;
+                    Debug.Print($"SceneUnit: {fac}");
+                    ti.Properties.Add("radius", RedHaloTools.GetValueByID<float>(tex, 0, 0)* fac);
 
                     // subdivs
                     ti.Properties.Add("subdivs", RedHaloTools.GetValueByID<int>(tex, 0, 8));
@@ -841,9 +840,9 @@ namespace RedHaloM2B.RedHaloUtils
                     ClipH = RedHaloTools.GetValueByID<float>(tex, 0, 23);
                     ClipW = RedHaloTools.GetValueByID<float>(tex, 0, 22);
 
-                    _filename = RedHaloTools.GetValueByID<string>(tex, 0, 0);
+                    _filename = RedHaloTools.GetActualPath(RedHaloTools.GetValueByID<string>(tex, 0, 0));
                     
-                    new_bm = null;                    
+                    //var new_bm = null;
 
                     // 如果开启了裁切，重新渲染一张新图
                     if (croppintApply == 1 && ((ClipH < 1) || (ClipW < 1)))
@@ -853,12 +852,12 @@ namespace RedHaloM2B.RedHaloUtils
                         string fileext = Path.GetExtension(_filename);
 
                         // 渲染新贴图
-                        var bmInfo = RedHaloTools.GetValueByID<IPBBitmap>(tex, 0, 13);
+                        //var bmInfo = RedHaloTools.GetValueByID<IPBBitmap>(tex, 0, 13);
 
-                        float bm_width = bmInfo.Bi.Width * ClipW > 2 ? bmInfo.Bi.Width * ClipW : 2;
-                        float bm_height = bmInfo.Bi.Height * ClipH > 2 ? bmInfo.Bi.Height * ClipH : 2;
+                        //float bm_width = bmInfo.Bi.Width * ClipW > 2 ? bmInfo.Bi.Width * ClipW : 2;
+                        //float bm_height = bmInfo.Bi.Height * ClipH > 2 ? bmInfo.Bi.Height * ClipH : 2;
 
-                        _filename = Path.Combine(filepath, $"{filename}_001{fileext}");
+                        //_filename = Path.Combine(filepath, $"{filename}_001{fileext}");
                         //new_bm = CreateBitmap(tex, (ushort)bm_width, (ushort)bm_height, _filename);
                     }
 
@@ -866,47 +865,41 @@ namespace RedHaloM2B.RedHaloUtils
                     uvgen = RedHaloTools.GetValueByID<IReferenceTarget>(tex, 0, 29) as IUVGen;                                       
 
                     ti.Properties.Add("filename", _filename);
-
                     ti.Properties.Add("clipu", ClipU);
                     ti.Properties.Add("clipv", ClipV);
                     ti.Properties.Add("clipw", ClipW);
                     ti.Properties.Add("cliph", ClipH);
 
                     AddImageWrapProperty(ti, stdUVGen);
-                    AddUvTransformProperties(ti, stdUVGen);                                       
+                    AddUvTransformProperties(ti, stdUVGen);
 
-                    ti.Properties.Add("alpha_source", RedHaloTools.GetValueByID<int>(tex, 0, 26));                    
+                    ti.Properties.Add("alpha_source", RedHaloTools.GetValueByID<int>(tex, 0, 26));
 
-                    // 贴图类型：纹理或环境
-                    // 0:Angular 1:Cubic 2:Spherical 3:Mirror Ball 4:3ds Max standard
+                    //// 贴图类型：纹理或环境
+                    //// 0:Angular 1:Cubic 2:Spherical 3:Mirror Ball 4:3ds Max standard
                     var environType = RedHaloTools.GetValueByID<int>(tex, 0, 3);
                     if (environType == 4)
                     {
-                        ti.Properties.Add("mapping_type", "TEXTURE");
-
-                        // 3ds standard texture
                         AddStandardMappingProperties(ti, stdUVGen, uvgen);
                     }
                     else
                     {
-                        ti.Properties.Add("mapping_type", "ENVIRON");
-
                         AddVRayEnvironmentMappingProperties(ti, environType);
                     }
-
                     ti.Properties.Add("mono_output", RedHaloTools.GetValueByID<int>(tex, 0, 25));
                     ti.Properties.Add("rgb_output", RedHaloTools.GetValueByID<int>(tex, 0, 24));
-                    //ti.Properties.Add("premult_alpha", $"{RedHaloTools.GetValueByID<int>(tex, 0, 12)}");
+                    ////ti.Properties.Add("premult_alpha", $"{RedHaloTools.GetValueByID<int>(tex, 0, 12)}");
 
-                    // Gain
+                    //// Gain
                     float overallMult = RedHaloTools.GetValueByID<float>(tex, 0, 1);
                     float renderMult = RedHaloTools.GetValueByID<float>(tex, 0, 2);
                     ti.Properties.Add("gain", overallMult * renderMult);
-                    
+
                     break;
 
                 case "VRayColor":
                     ti.Type = "color_map";
+                    maxRGB = RedHaloCore.Global.Color.Create(0, 0, 0);
                     // Color / Temp
                     // 如果是色温，转成颜色
                     var vrcolor_mode = RedHaloTools.GetValueByID<int>(tex, 0, 0);
@@ -923,6 +916,9 @@ namespace RedHaloM2B.RedHaloUtils
                         var clr_b = RedHaloTools.GetValueByID<float>(tex, 0, 4);
                         maxRGB = RedHaloCore.Global.Color.Create(clr_r, clr_g, clr_b);
                     }
+
+                    RedHaloTools.WriteLog($"VRayColor: mode={vrcolor_mode}, temperature={temperature}, color=({maxRGB.R},{maxRGB.G},{maxRGB.B})");
+
                     ti.Properties.Add("color", new[] { maxRGB.R, maxRGB.G, maxRGB.B, 1 });
 
                     // gamma

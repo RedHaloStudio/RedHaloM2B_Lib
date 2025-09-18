@@ -5,9 +5,115 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RedHaloM2B.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="350"
+    d:DesignHeight="280"
     d:DesignWidth="300"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="RH_Radio_Left" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="#4772b3" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Height" Value="auto" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Grid
+                            x:Name="grid"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            ClipToBounds="True">
+                            <Rectangle
+                                x:Name="ButtonStock"
+                                Margin="0,0,-5,0"
+                                Fill="{TemplateBinding Background}"
+                                RadiusX="5"
+                                RadiusY="5"
+                                Stroke="#4772b3"
+                                StrokeThickness="1" />
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Grid>
+                        <!--  触发器：选中状态  -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#4772b3" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.6" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="grid" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RH_Radio_Right" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="#4772b3" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Height" Value="auto" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Grid
+                            x:Name="grid"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            ClipToBounds="True">
+                            <Rectangle
+                                x:Name="ButtonStock"
+                                Margin="-5,0,0,0"
+                                Fill="{TemplateBinding Background}"
+                                RadiusX="5"
+                                RadiusY="5"
+                                Stroke="#4772b3"
+                                StrokeThickness="1" />
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Grid>
+                        <!--  触发器：选中状态  -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#4772b3" />
+                                <Setter Property="Foreground" Value="White" />
+
+                            </Trigger>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.6" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="grid" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
     <Grid x:Name="RedHaloUILayout">
         <Grid.RowDefinitions>
             <RowDefinition Height="45" />
@@ -22,100 +128,105 @@
                 VerticalAlignment="Center"
                 Source="/RedHaloM2B;component/images/RH_M2B_LOGO.jpg" />
         </StackPanel>
+
         <StackPanel
             Grid.Row="1"
-            Margin="10"
-            VerticalAlignment="Center"
-            Orientation="Horizontal">
-            <RadioButton
-                x:Name="rb1"
-                Width="140"
-                Background="Azure"
-                Foreground="White"
-                IsChecked="True">
-                <StackPanel Orientation="Horizontal">
-                    <Image
-                        Width="30"
-                        VerticalAlignment="Center"
-                        Source="/RedHaloM2B;component/images/clock-fast.png" />
-                    <TextBlock
-                        Margin="10,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="FAST" />
-                </StackPanel>
-            </RadioButton>
-            <RadioButton
-                x:Name="rb2"
-                Width="140"
-                Foreground="White">
-                <StackPanel Orientation="Horizontal">
-                    <Image
-                        Width="30"
-                        VerticalAlignment="Center"
-                        Source="/RedHaloM2B;component/images/Slow.png" />
-                    <TextBlock
-                        Margin="10,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="SLOW" />
-                </StackPanel>
-            </RadioButton>
+            Margin="5,0"
+            VerticalAlignment="Center">
+            <Label
+                Content="EXPORT MODE"
+                FontWeight="Bold"
+                Foreground="White" />
+            <StackPanel
+                Height="40"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <RadioButton
+                    x:Name="export_mode_fast"
+                    Width="137"
+                    IsChecked="True"
+                    Style="{StaticResource RH_Radio_Left}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Image Width="24">
+                            <Image.Source>
+                                <BitmapImage UriSource="/RedHaloM2B;component/images/fast.png" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Margin="5" HorizontalAlignment="Center">FAST ( USD )</TextBlock>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton
+                    x:Name="export_mode_slow"
+                    Width="137"
+                    Style="{StaticResource RH_Radio_Right}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Image Width="24">
+                            <Image.Source>
+                                <BitmapImage UriSource="/RedHaloM2B;component/images/slow.png" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Margin="5" HorizontalAlignment="Center">SLOW ( FBX )</TextBlock>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
         </StackPanel>
         <StackPanel
             Grid.Row="2"
-            Margin="10"
-            VerticalAlignment="Center"
-            Orientation="Horizontal">
-            <RadioButton
-                Width="140"
-                Foreground="White"
-                IsChecked="True">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Image
-                        Width="30"
-                        VerticalAlignment="Center"
-                        Source="/RedHaloM2B;component/images/all.png" />
-                    <TextBlock
-                        Margin="10,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="ALL" />
-                </StackPanel>
-            </RadioButton>
-            <RadioButton Width="140" Foreground="White">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Image
-                        Width="30"
-                        VerticalAlignment="Center"
-                        Source="/RedHaloM2B;component/images/check-selected.png" />
-                    <TextBlock
-                        Margin="10,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="SELECTED" />
-                </StackPanel>
-            </RadioButton>
+            Margin="5,0"
+            VerticalAlignment="Center">
+            <Label
+                Content="EXPORT OPTION"
+                FontWeight="Bold"
+                Foreground="White" />
+            <StackPanel Height="40" Orientation="Horizontal">
+                <RadioButton
+                    x:Name="export_all"
+                    Width="137"
+                    IsChecked="True"
+                    Style="{StaticResource RH_Radio_Left}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Image Width="24">
+                            <Image.Source>
+                                <BitmapImage UriSource="/RedHaloM2B;component/images/all.png" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Margin="5" HorizontalAlignment="Center">ALL</TextBlock>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton
+                    x:Name="export_selected"
+                    Width="137"
+                    Style="{StaticResource RH_Radio_Right}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Image Width="24">
+                            <Image.Source>
+                                <BitmapImage UriSource="/RedHaloM2B;component/images/selected.png" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Margin="5" HorizontalAlignment="Center">SELECTED</TextBlock>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
         </StackPanel>
         <StackPanel
             Grid.Row="3"
             Margin="10"
             VerticalAlignment="Center">
             <Button
-                Width="150"
+                Width="160"
                 Height="40"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="#FF313131"
                 Click="Button_Click"
                 FontWeight="Bold"
-                Foreground="White">
+                Foreground="#4772b3">
                 <StackPanel Orientation="Horizontal">
                     <Image
                         Width="20"
                         Margin="10,0"
                         Source="/RedHaloM2B;component/images/export.png" />
-                    <TextBlock x:Name="export_btn" VerticalAlignment="Center">EXPORT</TextBlock>
+                    <TextBlock x:Name="export_btn" VerticalAlignment="Center">EXPORT SCENE</TextBlock>
                 </StackPanel>
             </Button>
         </StackPanel>

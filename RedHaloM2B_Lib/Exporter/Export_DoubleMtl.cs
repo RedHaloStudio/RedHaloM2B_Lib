@@ -9,10 +9,10 @@ namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloDoubleMtl ExportDoubleMtl(IMtl inMaterial, int materialIndex)
+        public static RedHaloDoubleMtl ExportDoubleMtl(IMtl inMaterial)
         {
-            string materialName = $"material_{materialIndex:D5}";
             string materialOriginalName = inMaterial.Name;
+            string materialName = $"M_{RedHaloTools.CalcMD5FromString(materialOriginalName)}";
 
             //Set new name
             inMaterial.Name = materialName;
@@ -21,7 +21,7 @@ namespace RedHaloM2B
             {
                 Name = materialName,
                 SourceName = materialOriginalName,
-                Type = "DoubleMaterial",
+                Type = "double_material",
             };
 
             IMtl subMtl = null;

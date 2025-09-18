@@ -1052,7 +1052,12 @@ namespace RedHaloM2B
             return effectiveTexmap; // 返回处理后的纹理
         }
 
-        // 查看插件是否安装
+        /// <summary>
+        /// 查看插件是否安装
+        /// </summary>
+        /// <param name="pluginName">插件名字</param>
+        /// <param>USD：USD Importer</param>
+        /// <returns></returns>
         public static bool IsPluginInstalled(string pluginName)
         {
             // 提前处理输入参数，如果pluginName为null或空，则认为插件未安装
@@ -1136,128 +1141,14 @@ namespace RedHaloM2B
         public static void Test()
         {
             // 图片的Hash值，字典
-            Dictionary<string, string> textureHash = new Dictionary<string, string>();
+            //Dictionary<string, string> textureHash = new Dictionary<string, string>();
             // 获取场景中所有的贴图
-            textureHash = RedHaloTools.CollectAllBitmaps();            
-
-            var mats = MaterialUtils.GetSceneMaterials().ToList();
-            var mtl = mats.Where(ob => ob.Name == "01").First();
-            CleanupMaterial(mtl);
+            //textureHash = RedHaloTools.CollectAllBitmaps();            
+            
             //Debug.Print($"{mtl.ClassName(false)}");
             //Debug.Print($"{mtl.ClassID.PartA.ToString("X")} / {mtl.ClassID.PartB.ToString("X")}");
 
             //GetParams(mtl);
-        }
-
-        public static void ExportMtl(string tempOutDirectory)
-        {
-            var materials = MaterialUtils.GetSceneMaterials();
-            string outputFileName = System.IO.Path.Combine(tempOutDirectory, "RHM2B_MATERIAL.json");
-
-            RedHaloScene redhaloScene = new(tempOutDirectory);
-            var materialIndex = 0;
-
-            var basePbrMaterialType = new HashSet<string> {
-                   "VRayMtl", "CoronaPhysicalMtl","\rCoronaPhysicalMtl", "CoronaLegacyMtl", "Standard(Legacy)", "StandardMaterial", "VRayCarPaintMtl", "VRayCarPaintMtl2"
-            };
-
-            var lightMaterialType = new HashSet<string> {
-                   "VRayLightMtl", "CoronaLightMtl"
-            };
-
-            // Single Material
-            foreach (var material in materials)
-            {
-                var materialType = material.ClassName(false);
-
-                if (basePbrMaterialType.Contains(materialType))
-                {
-                    var redHaloPBRMtl = Exporter.ExportMaterial(material, materialIndex);
-                    if (redHaloPBRMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloPBRMtl);
-                    }
-                }
-                else if (lightMaterialType.Contains(materialType))
-                {
-                    var redHaloLightMtl = Exporter.ExportLightMaterial(material, materialIndex);
-                    if (redHaloLightMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloLightMtl);
-                    }
-                }
-
-                if (materialType == "CoronaSelectMtl")
-                {
-                    var selectIndex = RedHaloTools.GetValueByID<int>(material, 0, 2);
-                    var pb = material.GetParamBlock(0);
-                    var sub = pb.GetMtl(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
-                }
-
-                materialIndex++;
-            }
-
-            // mutli materials
-            foreach (var material in materials)
-            {
-                var materialType = material.ClassName(false);
-
-                if (materialType == "VRayBlendMtl")
-                {
-                    var redHaloMtl = Exporter.ExportVRayBlendMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "CoronaLayerMtl")
-                {
-                    var redHaloMtl = Exporter.ExportCoronaLayerMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "Blend")
-                {
-                    var redHaloMtl = Exporter.ExportDoubleMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "VRay2SidedMtl")
-                {
-                    var redHaloMtl = Exporter.ExportVRayDoubleMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "VRayOverrideMtl")
-                {
-                    var redHaloMtl = Exporter.ExportVRayOverrideMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-                else if (materialType == "CoronaRaySwitchMtl")
-                {
-                    var redHaloMtl = Exporter.ExportCoronaRaySwitchMtl(material, materialIndex);
-                    if (redHaloMtl != null)
-                    {
-                        redhaloScene.Materials.Add(redHaloMtl);
-                    }
-                }
-
-                materialIndex++;
-            }
-
-            #region WRITE FILE
-            //var writeSucess = RedHaloTools.WriteFile<RedHaloScene>(redhaloScene, outputFileName);
-            var writeSucess = RedHaloTools.WriteJsonFile<RedHaloScene>(redhaloScene, outputFileName);
-            #endregion
         }
 
         // 塌陷所有物体

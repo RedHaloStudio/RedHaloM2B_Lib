@@ -143,26 +143,38 @@ namespace RedHaloM2B
                     }
                     #endregion
 
-                    #region Specular / Reflection
-                    PBRMtl.ReflectionGroup.Specular = RedHaloCore.Global.RGBtoHSV(reflectClr)[2];
+                    #region Roughness / Specular / Reflection
 
-                    PBRMtl.ReflectionGroup.SpecularRoughness = RedHaloTools.GetValueByID<float>(material, 0, 10);
+                    // 反射颜色的亮度值作为 Specular Level的值
+                    PBRMtl.ReflectionGroup.SpecularLevel = RedHaloCore.Global.RGBtoHSV(reflectClr)[2];
 
-                    // Specular / Reflection Texmap
+                    // 反射的高光值作为 Roughness
+                    PBRMtl.ReflectionGroup.Roughness = RedHaloTools.GetValueByID<float>(material, 0, 10);
+
+                    // texmap_reflection 3-3
+                    // texmap_reflection_on 3-4
+                    // texmap_reflectionGlossiness 3-12
+                    // texmap_reflectionGlossiness_on 3-13
+                    // texmap_roughness 3-41
+                    // texmap_roughness_on 3-42
+
+
+                    // Roughness Texmap
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 70);
                     if (texmap != null)
                     {
-                        PBRMtl.ReflectionGroup.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.SpecularLevelTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
-                    // SpecularRoughness / Reflection Texmap
+                    // Specular Level Texmap
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 71);
                     if (texmap != null)
                     {
-                        PBRMtl.ReflectionGroup.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
+                    
                     #region Metallic
 
                     /*
@@ -182,6 +194,7 @@ namespace RedHaloM2B
                         PBRMtl.MetallicGroup.MetallicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
+                    
                     #region Opacity
 
                     PBRMtl.OpacityGroup.Opacity = RedHaloTools.GetValueByID<float>(material, 3, 40) / 100.0f;
@@ -193,6 +206,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
+                    
                     #region Subsurface
 
                     if (sss_on == 6)
@@ -228,6 +242,7 @@ namespace RedHaloM2B
                         }
                     }
                     #endregion
+                    
                     #region Anisotropic
                     PBRMtl.AnisotropicGroup.Anisotropic = RedHaloTools.GetValueByID<float>(material, 1, 1);
                     PBRMtl.AnisotropicGroup.AnisotropicRotation = (float)(RedHaloTools.GetValueByID<float>(material, 1, 2) % 360 / 360);
@@ -352,7 +367,41 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-                    
+
+                    #region BUMP
+                    PBRMtl.BumpGroup.Bump = RedHaloTools.GetValueByID<float>(material, 0, 102);
+
+                    // Bump Texmap
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 100);
+                    if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 101) == 1)
+                    {
+                        PBRMtl.BumpGroup.BumpTexmap = MaterialUtils.ExportTexmap(texmap);
+                    }
+                    #endregion
+
+                    #region DISPLACEMENT
+                    PBRMtl.DisplacementGroup.DisplacementMax = RedHaloTools.GetValueByID<float>(material, 0, 84);
+                    PBRMtl.DisplacementGroup.DisplacementMin = RedHaloTools.GetValueByID<float>(material, 0, 83);
+
+                    enabled = Convert.ToBoolean(RedHaloTools.GetValueByID<int>(material, 0, 85));
+                    if (enabled)
+                    {
+                        PBRMtl.DisplacementGroup.DisplacementWaterLevel = RedHaloTools.GetValueByID<float>(material, 0, 86);
+                    }
+                    else
+                    {
+                        PBRMtl.DisplacementGroup.DisplacementWaterLevel = 0.5f;
+                    }
+
+                    // Displacement Texmap
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 87);
+                    if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 88) == 1)
+                    {
+                        PBRMtl.DisplacementGroup.DisplacementTexmap = MaterialUtils.ExportTexmap(texmap);
+                    }
+
+                    #endregion
+
                     #region ThinFilm
 
                     if (RedHaloTools.GetValueByID<int>(material, 0, 61) == 1)
@@ -447,17 +496,27 @@ namespace RedHaloM2B
                     }
                     #endregion
 
-                    #region Specular / Reflection
+                    #region Specular / Reflection / Roughness
+                    // 反射颜色 * 反射系数
+                    // 反射颜色的亮度值作为 Specular Level 值
                     maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 9).MultiplyBy(RedHaloTools.GetValueByID<float>(material, 0, 7));
-                    PBRMtl.ReflectionGroup.Specular = RedHaloCore.Global.RGBtoHSV(maxClr)[2];
+                    PBRMtl.ReflectionGroup.SpecularLevel = RedHaloCore.Global.RGBtoHSV(maxClr)[2];
 
-                    PBRMtl.ReflectionGroup.SpecularRoughness = RedHaloTools.GetValueByID<float>(material, 0, 10);
+                    // 反射的高光值作为Roughness
+                    PBRMtl.ReflectionGroup.Roughness = RedHaloTools.GetValueByID<float>(material, 0, 10);
 
-                    // Specular Texmap
+                    // Specular Level Texmap
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 13);
                     if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 31) == 1)
                     {
-                        PBRMtl.ReflectionGroup.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.SpecularLevelTexmap = MaterialUtils.ExportTexmap(texmap);
+                    }
+
+                    // Roughness Texmap
+                    texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 14);
+                    if(texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 33) == 1)
+                    {
+                        PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -619,13 +678,13 @@ namespace RedHaloM2B
 
                     #region REFLECTION / SPECULAR / GLOSSINESS / ROUGHNESS
                     var CP_Reflect_Level = RedHaloTools.GetValueByID<float>(material, 0, 12);
-                    PBRMtl.ReflectionGroup.Specular = CP_Reflect_Level;
+                    PBRMtl.ReflectionGroup.Roughness = CP_Reflect_Level;
 
                     // Reflection Texmap
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 13);
                     if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 14) == 1)
                     {
-                        PBRMtl.ReflectionGroup.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 
@@ -883,21 +942,21 @@ namespace RedHaloM2B
 
                     #region REFLECTION / SPECULAR / GLOSSINESS / ROUGHNESS               
                     //var sp_clr = stdMat.GetSpecular(0, false);                    
-                    PBRMtl.ReflectionGroup.Specular = stdMat.GetShinStr(0); // Specular level
-                    PBRMtl.ReflectionGroup.SpecularRoughness = stdMat.GetShininess(0); // Glossiness
+                    PBRMtl.ReflectionGroup.SpecularLevel = stdMat.GetShinStr(0); // Specular level
+                    PBRMtl.ReflectionGroup.Roughness = stdMat.GetShininess(0); // Glossiness
 
                     // Specular textures
                     texmap = stdMat.GetSubTexmap(3);
                     if (texmap != null && stdMat.MapEnabled(3))
                     {
-                        PBRMtl.ReflectionGroup.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.SpecularLevelTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     // Specular Roughness
                     texmap = stdMat.GetSubTexmap(4);
                     if (texmap != null && stdMat.MapEnabled(4))
                     {
-                        PBRMtl.ReflectionGroup.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
                     #endregion
@@ -979,18 +1038,19 @@ namespace RedHaloM2B
                     #endregion
 
                     #region SPECULAR / REFLECTION
-                    PBRMtl.ReflectionGroup.Specular = RedHaloTools.GetValueByID<float>(material, 0, 2);
+                    PBRMtl.ReflectionGroup.Roughness = RedHaloTools.GetValueByID<float>(material, 0, 2);
+
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 44);
                     if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 45) == 1)
                     {
-                        PBRMtl.ReflectionGroup.SpecularTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
 
-                    PBRMtl.ReflectionGroup.SpecularRoughness = RedHaloTools.GetValueByID<float>(material, 0, 4);
+                    PBRMtl.ReflectionGroup.Roughness = RedHaloTools.GetValueByID<float>(material, 0, 4);
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 47);
                     if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 48) == 1)
                     {
-                        PBRMtl.ReflectionGroup.SpecularRoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
+                        PBRMtl.ReflectionGroup.SpecularLevelTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
 

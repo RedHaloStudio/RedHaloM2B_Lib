@@ -7,6 +7,13 @@ using UiViewModels.Actions;
 
 namespace RedHaloM2B
 {
+    public class RedHaloMenuStrings
+    {
+        public static string menuCategory = "REDHALO STUDIO";
+        public static string menuActionName = "Export to Blender...";
+        public static string menuName = "REDHALO";
+    }
+
     public abstract class RedHalo_CuiActionCommandAdapter : CuiActionCommandAdapter
     {
         public override string ActionText
@@ -21,12 +28,12 @@ namespace RedHaloM2B
 
         public override string InternalActionText
         {
-            get { return CustomActionText; }
+            get { return RedHaloMenuStrings.menuActionName; }
         }
 
         public override string InternalCategory
         {
-            get { return "RedHaloTools C#"; }
+            get { return RedHaloMenuStrings.menuCategory; }
         }
 
         public override void Execute(object parameter)
@@ -41,19 +48,14 @@ namespace RedHaloM2B
             }
         }
 
-        public abstract string CustomActionText { get; }
         public abstract void CustomExecute(object parameter);
     }
+
     /// <summary>
     /// This is the specific action item that can be added to a UI element like the menus.
     /// </summary>
     public class AdnCui_ExplodeGeometry : RedHalo_CuiActionCommandAdapter
     {
-        public override string CustomActionText
-        {
-            get { return "RedHalo Export Tools"; }
-        }
-
         public override void CustomExecute(object parameter)
         {
             try

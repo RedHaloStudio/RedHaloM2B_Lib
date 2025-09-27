@@ -5,16 +5,16 @@ namespace RedHaloM2B.Nodes
     public class RedHaloCamera : RedHaloBaseNode
     {
         [JsonProperty("fov")]
-        public float Fov { get; set; }
+        public float Fov { get; set; } = 50f;
 
         [JsonProperty("focaldistance")]
         public float FocalDistance { get; set; }
 
         [JsonProperty("clippingnear")]
-        public float ClippingNear { get; set; }
+        public float ClippingNear { get; set; } = 0.05f;
 
         [JsonProperty("clippingfar")]
-        public float ClippingFar { get; set; }
+        public float ClippingFar { get; set; } = 1000f;
 
         [JsonProperty("shiftx")]
         public float ShiftX { get; set; }
@@ -23,7 +23,7 @@ namespace RedHaloM2B.Nodes
         public float ShiftY { get; set; }
 
         [JsonProperty("sensorwidth")]
-        public float SensorWidth { get; set; }
+        public float SensorWidth { get; set; } = 36f;
 
         [JsonProperty("cameratype")]
         public int CameraType { get; set; }

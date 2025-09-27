@@ -109,7 +109,7 @@ namespace RedHaloM2B
             {
                 RedHaloTools.ExplodeGroup();
             }
-
+            /*
             // 图片的Hash值，字典
             Dictionary<string, string> texHash = RedHaloTools.CollectAllBitmaps();
 
@@ -122,6 +122,7 @@ namespace RedHaloM2B
 
                 mapHash.Add(item.Key, item.Value);
             }
+            */
 
             // 获取场景中所有的贴图
 
@@ -172,9 +173,11 @@ namespace RedHaloM2B
             {
                 RedHaloTools.RescaleScene(redhaloScene.Settings.WorldUnit);
             }
+            
             RedHaloTools.WriteLog($"场景缩放比例 ：{redhaloScene.Settings.WorldUnit}");
 
             var sceneNodes = RedHaloTools.GetSceneNodes();
+
             #region EXPORT NODES
 
             IEnumerable<IINode> staticMesh = sceneNodes.Where(o =>
@@ -227,6 +230,7 @@ namespace RedHaloM2B
                     RedHaloTools.ChangeProxyDisplay(tabs[0], RedHaloTools.ProxyMode.FULL);
                 }
             }
+            
             RedHaloTools.WriteLog($"场景中共有 {staticMesh.Count()} 个物体，导出 {staticMesh.Count()} 个");
             // 重置Index
             index = 0;
@@ -259,9 +263,6 @@ namespace RedHaloM2B
 
             foreach (var light in lightNodes)
             {
-                //Debug.Print(light.Name);
-                //Debug.Print($"0x{light.ObjectRef.ClassID.PartA.ToString("X").PadLeft(8,'0')}, 0x{light.ObjectRef.ClassID.PartB.ToString("X").PadLeft(8, '0')}");
-
                 if (nodeKeys.Contains(light.Name))
                 {
                     continue;
@@ -452,6 +453,7 @@ namespace RedHaloM2B
             }
 
             #endregion
+            
             RedHaloTools.WriteLog($"=========导出材质结束=========");
 
             #region WRITE XML FILE / JSON FILE
@@ -490,7 +492,6 @@ namespace RedHaloM2B
 
 
                 RedHaloTools.WriteLog($"导出模型成功，文件路径：{outputModelFileName}");
-                /// return 0;
             }
             else
             {

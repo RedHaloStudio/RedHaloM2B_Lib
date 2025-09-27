@@ -353,7 +353,11 @@ namespace RedHaloM2B.RedHaloUtils
 
                     if (numParamBlocks == 0 && anim != null)
                     {
+#if MAX2022 || MAX2023
                         string paramName = anim.SubAnimName(1);
+#elif MAX2024 || MAX2025 || MAX2026
+                        string paramName = anim.SubAnimName(1, false);
+#endif
                         IAnimatable subAnim = anim.SubAnim(1);
 
                         if (paramName == "Parameters")
@@ -385,6 +389,15 @@ namespace RedHaloM2B.RedHaloUtils
                                 float horizontal_count = pb.GetFloat(2, 0);
                                 // 3 Vertical Count: Type: Float
                                 float vertical_count = pb.GetFloat(3, 0);
+                                if(horizontal_count == 0)
+                                {
+                                    horizontal_count = 1;
+                                }
+
+                                if(vertical_count == 0)
+                                {
+                                    vertical_count = 1;
+                                }
 
                                 brickWidth = 1 / horizontal_count;
                                 brickHeight = 1 / vertical_count;
@@ -702,7 +715,7 @@ namespace RedHaloM2B.RedHaloUtils
                     ti.Properties.Add("map", RedHaloTools.GetValueByID<int>(tex, 0, 0));
                     break;
 
-                #endregion
+#endregion
 
                 #region VRay Textures
                 // VRay Textures
@@ -904,7 +917,9 @@ namespace RedHaloM2B.RedHaloUtils
                     // 如果是色温，转成颜色
                     var vrcolor_mode = RedHaloTools.GetValueByID<int>(tex, 0, 0);
                     var temperature = 6500f;
-                    if ( vrcolor_mode == 0)
+
+
+                    if ( vrcolor_mode != 0)
                     {
                         temperature = RedHaloTools.GetValueByID<float>(tex, 0, 1);
                         maxRGB = RedHaloTools.GetRgbFromKelvin(temperature);
@@ -916,8 +931,6 @@ namespace RedHaloM2B.RedHaloUtils
                         var clr_b = RedHaloTools.GetValueByID<float>(tex, 0, 4);
                         maxRGB = RedHaloCore.Global.Color.Create(clr_r, clr_g, clr_b);
                     }
-
-                    RedHaloTools.WriteLog($"VRayColor: mode={vrcolor_mode}, temperature={temperature}, color=({maxRGB.R},{maxRGB.G},{maxRGB.B})");
 
                     ti.Properties.Add("color", new[] { maxRGB.R, maxRGB.G, maxRGB.B, 1 });
 
@@ -989,11 +1002,11 @@ namespace RedHaloM2B.RedHaloUtils
                     var exeludeMode = RedHaloTools.GetValueByID<int>(tex, 0, 12);
                     if (exeludeMode == 3)
                     {
-                        ti.Properties.Add("only_sameobject", "1");
+                        ti.Properties.Add("only_sameobject", 1);
                     }
                     else
                     {
-                        ti.Properties.Add("only_sameobject", "0");
+                        ti.Properties.Add("only_sameobject", 0);
                     }
                     
 
@@ -1065,8 +1078,8 @@ namespace RedHaloM2B.RedHaloUtils
 
                     ti.Properties.Add("color", new[] { 0.8, 0.8, 0.8, 1 });
 
-                    ti.Properties.Add("hue", RedHaloTools.GetValueByID<float>(tex, 0, 23));
-                    ti.Properties.Add("saturation", RedHaloTools.GetValueByID<float>(tex, 0, 4));
+                    ti.Properties.Add("hue", RedHaloTools.GetValueByID<float>(tex, 0, 23)/360 + 0.5f); // max: [-180, 180, 0]  Blender:[0, 1, 0.5]
+                    ti.Properties.Add("saturation", RedHaloTools.GetValueByID<float>(tex, 0, 4) + 1.0f); // [-1, 1, 0] Blender:[0, 1, 1]
 
                     // Color Mode
                     var clrInvert = RedHaloTools.GetValueByID<int>(tex, 0, 9);
@@ -1079,9 +1092,9 @@ namespace RedHaloM2B.RedHaloUtils
                         ti.Properties.Add("color_mode", "NORMAL");
                     }
 
-                    ti.Properties.Add("gamma", RedHaloTools.GetValueByID<float>(tex, 0, 12));
-                    ti.Properties.Add("brightness", RedHaloTools.GetValueByID<float>(tex, 0, 2));
-                    ti.Properties.Add("contrast", RedHaloTools.GetValueByID<float>(tex, 0, 3));
+                    ti.Properties.Add("gamma", RedHaloTools.GetValueByID<float>(tex, 0, 12)); // [0.01, 10, 1] blender:[0.001,10,1.]
+                    ti.Properties.Add("brightness", RedHaloTools.GetValueByID<float>(tex, 0, 2)); // [-1, 1, 0] blender:[-1, 1, 0]
+                    ti.Properties.Add("contrast", RedHaloTools.GetValueByID<float>(tex, 0, 3) - 1); // [0, 99, 1] blender:[-100, 100, 0]
 
                     // Texmap
                     var cr_ccTexmap = RedHaloTools.GetValueByID<ITexmap>(tex, 0, 1);

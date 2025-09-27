@@ -14,9 +14,11 @@ namespace RedHaloM2B
             var maxCameraState = RedHaloCore.Global.CameraState.Create();
             var maxSensorWidth = RedHaloCore.Core.RendApertureWidth;
 
-            float cFov = 35.0f;
-            float cClippingNear = 0.1f;
-            float cClippingFar = 20f;
+            int cEnabledClipping = 0;
+
+            float cFov = 50.0f;
+            float cClippingNear = 0.05f;
+            float cClippingFar = 1000f;
             float cShiftX = 0.0f;
             float cShiftY = 0.0f;
             float cSensorWidth = 36.0f;
@@ -66,8 +68,13 @@ namespace RedHaloM2B
                 // Default target camera
                 case 0x00001002:
                     redHaloCamera.Fov = Convert.ToSingle(maxSensorWidth / 2 / Math.Tan(maxCamera.GetFOV(0) / 2.0f));
-                    redHaloCamera.ClippingNear = maxCamera.GetClipDist(0, 1);
-                    redHaloCamera.ClippingFar = maxCamera.GetClipDist(0, 2);
+
+                    if (maxCamera.ManualClip != 0)
+                    {
+                        redHaloCamera.ClippingNear = maxCamera.GetClipDist(0, 1);
+                        redHaloCamera.ClippingFar = maxCamera.GetClipDist(0, 2);
+                    }
+
                     redHaloCamera.SensorWidth = maxSensorWidth;
                     redHaloCamera.CameraType = maxCamera.IsOrtho ? 0 : 1;
                     break;
@@ -84,13 +91,19 @@ namespace RedHaloM2B
                         camParamBlock.GetValue(camParamBlock.IndextoID(6), 0, ref cSensorWidth, RedHaloCore.Forever, 0);
                         redHaloCamera.SensorWidth = cSensorWidth;
 
-                        //Clip Min
-                        camParamBlock.GetValue(camParamBlock.IndextoID(49), 0, ref cClippingNear, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingNear = cClippingNear;
+                        // Clipping On
+                        camParamBlock.GetValue(camParamBlock.IndextoID(48), 0, ref cEnabledClipping, RedHaloCore.Forever, 0);
 
-                        //Clip Max
-                        camParamBlock.GetValue(camParamBlock.IndextoID(50), 0, ref cClippingFar, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingFar = cClippingFar;
+                        if (cEnabledClipping != 0)
+                        {
+                            //Clip Min
+                            camParamBlock.GetValue(camParamBlock.IndextoID(49), 0, ref cClippingNear, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingNear = cClippingNear;
+
+                            //Clip Max
+                            camParamBlock.GetValue(camParamBlock.IndextoID(50), 0, ref cClippingFar, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingFar = cClippingFar;
+                        }
 
                         //Shift X
                         camParamBlock.GetValue(camParamBlock.IndextoID(40), 0, ref cShiftX, RedHaloCore.Forever, 0);
@@ -114,20 +127,24 @@ namespace RedHaloM2B
                     {
                         //Fov
                         camParamBlock.GetValue(camParamBlock.IndextoID(21), 0, ref cFov, RedHaloCore.Forever, 0);
-                        Debug.WriteLine(cFov);
                         redHaloCamera.Fov = cFov;
 
                         //SensorWidth
                         camParamBlock.GetValue(camParamBlock.IndextoID(23), 0, ref cSensorWidth, RedHaloCore.Forever, 0);
-                        redHaloCamera.SensorWidth = cSensorWidth;
+                        redHaloCamera.SensorWidth = cSensorWidth;                        
 
-                        //Clip Min
-                        camParamBlock.GetValue(camParamBlock.IndextoID(5), 0, ref cClippingNear, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingNear = cClippingNear;
+                        // Camera Clipping
+                        camParamBlock.GetValue(camParamBlock.IndextoID(4), 0, ref cEnabledClipping, RedHaloCore.Forever, 0);
+                        if(cEnabledClipping != 0)
+                        {
+                            //Clip Min
+                            camParamBlock.GetValue(camParamBlock.IndextoID(5), 0, ref cClippingNear, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingNear = cClippingNear;
 
-                        //Clip Max
-                        camParamBlock.GetValue(camParamBlock.IndextoID(6), 0, ref cClippingFar, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingFar = cClippingFar;
+                            //Clip Max
+                            camParamBlock.GetValue(camParamBlock.IndextoID(6), 0, ref cClippingFar, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingFar = cClippingFar;
+                        }                        
 
                         //Shift X
                         camParamBlock.GetValue(camParamBlock.IndextoID(75), 0, ref cShiftX, RedHaloCore.Forever, 0);
@@ -158,13 +175,19 @@ namespace RedHaloM2B
                         camParamBlock.GetValue(camParamBlock.IndextoID(9), 0, ref cSensorWidth, RedHaloCore.Forever, 0);
                         redHaloCamera.SensorWidth = cSensorWidth;
 
-                        //Clip Min
-                        camParamBlock.GetValue(camParamBlock.IndextoID(55), 0, ref cClippingNear, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingNear = cClippingNear;
+                        // Clip On
+                        camParamBlock.GetValue(camParamBlock.IndextoID(54), 0, ref cEnabledClipping, RedHaloCore.Forever, 0);
 
-                        //Clip Max
-                        camParamBlock.GetValue(camParamBlock.IndextoID(56), 0, ref cClippingFar, RedHaloCore.Forever, 0);
-                        redHaloCamera.ClippingNear = cClippingFar;
+                        if (cEnabledClipping != 0)
+                        {
+                            //Clip Min
+                            camParamBlock.GetValue(camParamBlock.IndextoID(55), 0, ref cClippingNear, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingNear = cClippingNear;
+
+                            //Clip Max
+                            camParamBlock.GetValue(camParamBlock.IndextoID(56), 0, ref cClippingFar, RedHaloCore.Forever, 0);
+                            redHaloCamera.ClippingNear = cClippingFar;
+                        }
 
                         //Shift X
                         camParamBlock.GetValue(camParamBlock.IndextoID(38), 0, ref cShiftX, RedHaloCore.Forever, 0);

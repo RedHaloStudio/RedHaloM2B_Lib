@@ -41,7 +41,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autodesk.Max, Version=27.0.0.4918, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Autodesk.Max, Version=26.2.0.22013, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files\Autodesk\3ds Max 2023\Autodesk.Max.dll</HintPath>
     </Reference>
@@ -86,7 +86,6 @@
     <Compile Include="Log\RedHalo_Log.cs" />
     <Compile Include="Others\Productor.cs" />
     <Compile Include="Others\RedHalo_ParamID.cs" />
-    <Compile Include="Others\RHAssetCallBack.cs" />
     <Compile Include="Others\Scene.cs" />
     <Compile Include="Others\ProgramSettings.cs" />
     <Compile Include="Others\SceneSettings.cs" />
@@ -110,7 +109,6 @@
     </Compile>
     <Compile Include="RedHaloCore.cs" />
     <Compile Include="settings.cs" />
-    <Compile Include="Utils\RedHaloMenuUtilities.cs" />
     <Compile Include="RedHaloTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedHalo_Export.cs" />
@@ -130,6 +128,7 @@
     <Compile Include="Utils\RedHalo_LightingConvert.cs" />
     <Compile Include="Utils\RedHalo_MaterialUtils.cs" />
     <Compile Include="Utils\RedHalo_MathUtils.cs" />
+    <Compile Include="Utils\RedHalo_Menu.cs" />
     <Compile Include="Utils\RedHalo_ScriptsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +161,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(ProjectDir)post.bat" "$(TargetDir)" "$(ConfigurationName)" 2023</PostBuildEvent>
+    <PostBuildEvent>rem call "$(ProjectDir)post.bat" "$(TargetDir)" "$(ConfigurationName)" 2023</PostBuildEvent>
   </PropertyGroup>
 </Project>

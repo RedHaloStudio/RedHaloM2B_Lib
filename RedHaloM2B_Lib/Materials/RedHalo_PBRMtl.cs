@@ -81,17 +81,20 @@ namespace RedHaloM2B.Materials
 
     public class ReflectionGroup
     {
-        [JsonProperty("specular")]
-        public float Specular { get; set; }
+        // 材质的 糙度值， 对应的是VRay的高光，[ 1 - 高光值 ]
+        [JsonProperty("roughness")]
+        public float Roughness { get; set; } = 0.5f;
 
         [JsonProperty("texmap")]
-        public TexmapInfo SpecularTexmap { get; set; }
+        public TexmapInfo RoughnessTexmap { get; set; }
 
-        [JsonProperty("roughness")]
-        public float SpecularRoughness { get; set; }
+        // 反射系数，默认为0.5
+        // Corona物理材质不存在此值
+        [JsonProperty("specular")]
+        public float SpecularLevel { get; set; } = 0.5f;
 
-        [JsonProperty("roughness_texmap")]
-        public TexmapInfo SpecularRoughnessTexmap { get; set; }
+        [JsonProperty("specular_texmap")]
+        public TexmapInfo SpecularLevelTexmap { get; set; }
     }
 
     public class AnisotropicGroup

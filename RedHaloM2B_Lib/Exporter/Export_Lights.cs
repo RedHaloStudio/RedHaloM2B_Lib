@@ -1,6 +1,7 @@
 ﻿using Autodesk.Max;
 using RedHaloM2B.Nodes;
 using System;
+using System.Diagnostics;
 
 namespace RedHaloM2B
 {
@@ -77,9 +78,14 @@ namespace RedHaloM2B
                     /// 0:Default(Image) 1:Luminous power(lm) 2:Luminous(lm/m^2/sr) 3:Radiant power(W) 4:Radiance(W/m^2/sr)                        
                     int lightUnit = 0;
                     lightPB.GetValue(lightPB.IndextoID(8), 0, ref lightUnit, RedHaloCore.Forever, 0);
-
+                    if (lightUnit != 0)
+                    {
+                        lightPB.SetValue(lightPB.IndextoID(8), 0, 0, 0);
+                    }
+                    
                     float lightStrength = 0f;
                     lightPB.GetValue(lightPB.IndextoID(7), 0, ref lightStrength, RedHaloCore.Forever, 0);
+
                     switch (lightUnit)
                     {
                         case 0:
@@ -271,6 +277,10 @@ namespace RedHaloM2B
                     #region Strength
                     int intensityUnits = 0;
                     lightPB.GetValue(lightPB.IndextoID(9), 0, ref intensityUnits, RedHaloCore.Forever, 0);
+                    if (intensityUnits == 0)
+                    {
+                        lightPB.SetValue(lightPB.IndextoID(9), 0, 0, 0);
+                    }
 
                     float cr_strength = 0;
                     lightPB.GetValue(lightPB.IndextoID(7), 0, ref cr_strength, RedHaloCore.Forever, 0);
@@ -278,7 +288,7 @@ namespace RedHaloM2B
                     switch (intensityUnits)
                     {
                         case 0: // W/(sr*m^2)
-                            _strength = LightingConvert.Lumen2Watt(cr_strength);
+                            _strength = cr_strength;
                             break;
                         case 1: // Candel
                             _strength = LightingConvert.Candel2Watt(cr_strength);
@@ -287,7 +297,7 @@ namespace RedHaloM2B
                             _strength = LightingConvert.Lumen2Watt(cr_strength);
                             break;
                         case 3: // Lx
-
+                            _strength = LightingConvert.Luminance2Watt(cr_strength);
                             break;
                         default:
                             break;

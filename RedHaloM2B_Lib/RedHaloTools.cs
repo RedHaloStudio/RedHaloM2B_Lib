@@ -10,7 +10,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RedHaloM2B
 {
@@ -408,6 +410,25 @@ namespace RedHaloM2B
             for (int p = 0; p < mtl.NumParamBlocks; p++)
             {
                 var pb2 = mtl.GetParamBlock(p);
+                for (int d = 0; d < pb2.NumParams; d++)
+                {
+                    var pid = pb2.IndextoID(d);
+                    var def = pb2.GetParamDef(pid);
+
+                    Debug.WriteLine($"{p}\t{d}\t{def.Type}\t{def.IntName}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get All Params Name
+        /// </summary>
+        /// <param name="node"></param>
+        public static void GetParams(ICameraObject node)
+        {
+            for (int p = 0; p < node.NumParamBlocks; p++)
+            {
+                var pb2 = node.GetParamBlock(p);
                 for (int d = 0; d < pb2.NumParams; d++)
                 {
                     var pid = pb2.IndextoID(d);
@@ -1137,18 +1158,35 @@ namespace RedHaloM2B
 
             return fileSteamHash;
         }
-        
+
         public static void Test()
         {
-            // 图片的Hash值，字典
-            //Dictionary<string, string> textureHash = new Dictionary<string, string>();
-            // 获取场景中所有的贴图
-            //textureHash = RedHaloTools.CollectAllBitmaps();            
-            
-            //Debug.Print($"{mtl.ClassName(false)}");
-            //Debug.Print($"{mtl.ClassID.PartA.ToString("X")} / {mtl.ClassID.PartB.ToString("X")}");
+            //var objs = GetSceneNodes();
+            //var camera = objs.Where(m => m.Name == "Corona_Camera007").First();
 
-            //GetParams(mtl);
+            //// 创建 Max 相机和相机状态对象
+            //var maxCamera = camera.ObjectRef.FindBaseObject() as ICameraObject;
+            //maxCamera.EvalCameraState(0, RedHaloCore.Forever, RedHaloCore.Global.CameraState.Create());
+
+            //var pb = maxCamera.GetParamBlock(0);
+            //Debug.Print($"{pb.NumParams}");
+
+            //GetParams(maxCamera);
+
+            var actionManager = RedHaloCore.Core.ActionManager;
+            for (var actionTableIndex = 0; actionTableIndex < actionManager.NumActionTables; ++actionTableIndex)
+            {
+                var actionTable = actionManager.GetTable(actionTableIndex);
+                //Debug.Print($"{actionTable.Name}");
+                if (actionTable.Name == "REDHALO STUDIO")
+                {
+                    Debug.Print($"REDHALO STUDIO ID: {actionTable.Id.PartA} - {actionTable.Id.PartB}");
+                    for (int i = 0; i < actionTable.Count; ++i)
+                    {
+                        Debug.Print($"  {actionTable[i].MenuText} / {actionTable[i].Id.PartA} / {actionTable[i].Id.PartB}");
+                    }
+                }
+            }
         }
 
         // 塌陷所有物体
@@ -1156,7 +1194,7 @@ namespace RedHaloM2B
         {
             IINodeTab tabs = RedHaloCore.Global.INodeTab.Create();
 
-            foreach (var item in GetSceneNodes())
+            foreach (var item in GetSceneNodes().Where(obj => obj.ObjectRef.FindBaseObject().SuperClassID != SClass_ID.Light))
             {
                 RedHaloCore.Global.IInstanceMgr.InstanceMgr.GetInstances(item, tabs);
                 IINode firstTab = tabs[0];

@@ -56,29 +56,32 @@ namespace RedHaloM2B
     /// </summary>
     public class AdnCui_ExplodeGeometry : RedHalo_CuiActionCommandAdapter
     {
+        private Window dialog;
         public override void CustomExecute(object parameter)
         {
             try
             {
-                Window dialog = new Window();
-                dialog.Title = "RedHalo Studio";
-                dialog.SizeToContent = SizeToContent.Manual;
-                dialog.Width = 300;
-                dialog.Height = 350;
-                dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                dialog.ShowInTaskbar = false;
-                dialog.ResizeMode = ResizeMode.NoResize;
+                if (dialog == null)
+                {
+                    dialog = new Window();
+                    dialog.Title = "RedHalo Studio";
+                    dialog.SizeToContent = SizeToContent.Manual;
+                    dialog.Width = 300;
+                    dialog.Height = 350;
+                    dialog.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    dialog.ShowInTaskbar = false;
+                    dialog.ResizeMode = ResizeMode.NoResize;
 
-                RedHaloUI redHaloUI = new RedHaloUI(dialog);
+                    RedHaloUI redHaloUI = new RedHaloUI(dialog);
+                    dialog.Content = redHaloUI;
 
-                dialog.Content = redHaloUI;
+                    System.Windows.Interop.WindowInteropHelper windowHandle = new System.Windows.Interop.WindowInteropHelper(dialog);
+                    windowHandle.Owner = AppSDK.GetMaxHWND();
+                    AppSDK.ConfigureWindowForMax(dialog);
 
-                System.Windows.Interop.WindowInteropHelper windowHandle = new System.Windows.Interop.WindowInteropHelper(dialog);
-                windowHandle.Owner = AppSDK.GetMaxHWND();
-                AppSDK.ConfigureWindowForMax(dialog);
-
-                dialog.Show(); //modal version; this prevents changes being made to model while our dialog is running, etc.
-                //dialog.ShowDialog(); //窗口前置，阻塞后续代码执行
+                    dialog.Show(); //modal version; this prevents changes being made to model while our dialog is running, etc.
+                    //dialog.ShowDialog(); //窗口前置，阻塞后续代码执行
+                }
             }
             catch (Exception ex)
             {

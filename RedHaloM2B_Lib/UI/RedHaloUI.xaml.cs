@@ -42,10 +42,10 @@ namespace RedHaloM2B.UI
             RedHaloUILayout.Background = colorBack;
 
             // Get current text color and match our dialog to it.
-            //System.Drawing.Color dcolText = cm.GetColor(GuiColors.Text, Autodesk.Max.IColorManager.State.Normal);
+            System.Drawing.Color dcolText = colorMan.GetColor(GuiColors.Text, Autodesk.Max.IColorManager.State.Normal);
             // pre 2017: Color mcolorText = Color.FromRgb(dcolText.B, dcolText.G, dcolText.R);
-            //Color mcolorText = Color.FromRgb(dcolText.R, dcolText.G, dcolText.B);
-            //Brush colorText = new SolidColorBrush(mcolorText);
+            Color mcolorText = Color.FromRgb(dcolText.R, dcolText.G, dcolText.B);
+            Brush colorText = new SolidColorBrush(mcolorText);
 
             // To use pure white, we can just set a system brush.
             //Brush colorText = Brushes.White;

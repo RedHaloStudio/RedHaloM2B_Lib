@@ -5,6 +5,28 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedHaloM2B", "RedHaloM2B_Lib\RedHaloM2B.csproj", "{BCA96477-83C9-4DD5-9672-32E603CD6D46}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Boundle", "Boundle", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Boundle\PackageContents.xml = Boundle\PackageContents.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icon", "icon", "{4C35D135-23E2-4777-9BA5-860DF10A5737}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contents", "Contents", "{5E0B8268-8261-4A5D-B3BB-7999D66AA849}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "macroscripts", "macroscripts", "{19FF5BE0-90BD-4CC0-8748-947D148180B2}"
+	ProjectSection(SolutionItems) = preProject
+		Boundle\Contents\macroscripts\RedHalo_M2B.mcr = Boundle\Contents\macroscripts\RedHalo_M2B.mcr
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bin", "bin", "{8FB5D1AB-03D6-48BA-BD68-8337799A0DA3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Post-Start-Up_Scripts", "Post-Start-Up_Scripts", "{0D9DFE89-312B-4F0F-89FE-6113EDCCD6F7}"
+	ProjectSection(SolutionItems) = preProject
+		Boundle\Contents\Post-Start-Up_Scripts\RedHalo_M2B_SetupMenu.ms = Boundle\Contents\Post-Start-Up_Scripts\RedHalo_M2B_SetupMenu.ms
+		Boundle\Contents\Post-Start-Up_Scripts\RedHalo_M2B_SetupMenu2025.ms = Boundle\Contents\Post-Start-Up_Scripts\RedHalo_M2B_SetupMenu2025.ms
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +40,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C35D135-23E2-4777-9BA5-860DF10A5737} = {5E0B8268-8261-4A5D-B3BB-7999D66AA849}
+		{5E0B8268-8261-4A5D-B3BB-7999D66AA849} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{19FF5BE0-90BD-4CC0-8748-947D148180B2} = {5E0B8268-8261-4A5D-B3BB-7999D66AA849}
+		{8FB5D1AB-03D6-48BA-BD68-8337799A0DA3} = {5E0B8268-8261-4A5D-B3BB-7999D66AA849}
+		{0D9DFE89-312B-4F0F-89FE-6113EDCCD6F7} = {5E0B8268-8261-4A5D-B3BB-7999D66AA849}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDA1254E-927E-47A3-8A53-F41833453486}

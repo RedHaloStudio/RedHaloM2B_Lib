@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage 
+  SchemaVersion="1.0"
+  AutodeskProduct="3ds Max"
+  Name="RedHalo-M2B" 
+  DescriptionLong="This is a plugin to explode geometry into faces." 
+  Description="3ds Max Export Scene to Blender."
+  AppVersion="1.0.0" 
+  FriendlyVersion="1.0.0"
+  ProductType="Application"
+  HelpFile="" 
+  SupportedLocales="Enu"
+  AppNameSpace="apps.redhalostudio.com"
+  Author="RedHalo Studio" 
+  ProductCode="{B73E40CE-4311-EEC8-1B28-E69A2ADD143D}"
+  UpgradeCode="{EA8918E9-79FC-D4E8-0D58-4A6D2A8D7B34}" 
+  OnlineDocumentation=""
+  Icon="./Contents/Icon/RedHaloM2B.ico">
+  <CompanyDetails 
+    Name="RedHalo Studio" 
+    Phone="" 
+    Url="" 
+    Email="redhalostudio@outlook.com" />
+
+  <RuntimeRequirements 
+    OS="Win64"
+    Platform="3ds Max" 
+    SeriesMin="2020" 
+    SeriesMax="2026" />
+
+  <!-- Add MacroScript to be executed by the menu entry added under AppStore > Explode Selected Geometry -->
+  <Components Description="macroscripts parts">
+    <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2020" SeriesMax="2026" />
+    <ComponentEntry AppName="RedHalo_M2B"
+					Version="1.0.0"
+					ModuleName="./Contents/macroscripts/RedHalo_M2B.mcr"
+					AppDescription="RedHalo_M2B" />
+  </Components>
+
+  <!-- Script to add menu context to the AppStore Menu Entry -->
+  <Components Description="post-start-up scripts parts">
+    <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2020" SeriesMax="2024" />
+    <ComponentEntry AppName="RedHalo_M2B"
+					Version="1.0.0"
+					ModuleName="./Contents/Post-Start-Up_Scripts/RedHalo_M2B_SetupMenu.ms"
+					AppDescription="Setup Menu to execute tool" />
+  </Components>
+
+  <!-- Script to add menu to the AppStore Menu Entry, uses new menu system starting 3ds Max 2025 -->
+  <Components Description="post-start-up scripts parts">
+    <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2025" SeriesMax="2026" />
+    <ComponentEntry AppName="RedHalo_M2B"
+					Version="1.0.0"
+					ModuleName="./Contents/Post-Start-Up_Scripts/RedHalo_M2B_SetupMenu2025.ms"
+					AppDescription="Setup Menu to execute tool" />
+  </Components>
+
+  <!-- Add ExplodeGeometry Assembly for 3ds Max 2020 to 2023 -->
+  <Components Description="assemblies parts">
+    <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2023" SeriesMax="2023" />
+    <ComponentEntry AppName="RedHalo_M2B"
+					Version="1.0.0"
+					ModuleName="./Contents/bin/2023/ADNExplodeGeometry.dll"
+					AppDescription="The RedHalo_M2B managed assembly module" />
+  </Components>
+
+</ApplicationPackage>

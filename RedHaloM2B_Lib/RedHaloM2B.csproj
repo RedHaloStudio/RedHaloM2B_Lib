@@ -40,6 +40,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autodesk.Max, Version=26.2.0.22013, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -124,11 +127,11 @@
     </Compile>
     <Compile Include="Utils\BitmapTypes.cs" />
     <Compile Include="Utils\CropParameters.cs" />
+    <Compile Include="Utils\Loader.cs" />
     <Compile Include="Utils\RedHalo_ClassID.cs" />
     <Compile Include="Utils\RedHalo_LightingConvert.cs" />
     <Compile Include="Utils\RedHalo_MaterialUtils.cs" />
     <Compile Include="Utils\RedHalo_MathUtils.cs" />
-    <Compile Include="Utils\RedHalo_Menu.cs" />
     <Compile Include="Utils\RedHalo_ScriptsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

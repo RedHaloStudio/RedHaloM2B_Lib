@@ -1,6 +1,4 @@
-﻿using System.Security.Policy;
-
-namespace RedHaloM2B.Materials
+﻿namespace RedHaloM2B.Materials
 {
     internal class RedHaloMutliMtl
     {

@@ -10,7 +10,7 @@ namespace RedHaloM2B.Textures
 
         [JsonProperty(propertyName: "subtexmap")]
         public Dictionary<string, TexmapInfo> subTexmapInfo { get; set; } = new Dictionary<string, TexmapInfo>();
-        
+
         public TexmapInfo() { }
     }
 }

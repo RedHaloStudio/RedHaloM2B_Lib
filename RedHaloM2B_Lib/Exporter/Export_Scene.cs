@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Media.Media3D;
 
 namespace RedHaloM2B
 {
@@ -173,7 +172,7 @@ namespace RedHaloM2B
             {
                 RedHaloTools.RescaleScene(redhaloScene.Settings.WorldUnit);
             }
-            
+
             RedHaloTools.WriteLog($"场景缩放比例 ：{redhaloScene.Settings.WorldUnit}");
 
             var sceneNodes = RedHaloTools.GetSceneNodes();
@@ -230,7 +229,7 @@ namespace RedHaloM2B
                     RedHaloTools.ChangeProxyDisplay(tabs[0], RedHaloTools.ProxyMode.FULL);
                 }
             }
-            
+
             RedHaloTools.WriteLog($"场景中共有 {staticMesh.Count()} 个物体，导出 {staticMesh.Count()} 个");
             // 重置Index
             index = 0;
@@ -244,7 +243,7 @@ namespace RedHaloM2B
 
             foreach (var cam in cameraNodes)
             {
-                redHaloCamera = Exporter.ExportCamera(cam, index);
+                redHaloCamera = Exporter.ExportCamera(cam);
                 redhaloScene.Cameras.Add(redHaloCamera);
                 index++;
             }
@@ -271,13 +270,16 @@ namespace RedHaloM2B
                 {
                     RedHaloCore.Global.IInstanceMgr.InstanceMgr.GetInstances(light, tabs);
 
-                    string BaseObjectName = $"light_{index:D5}";
+                    string md5 = RedHaloTools.CalcMD5FromString(light.Name);
+                    //string lightName = $"light_{lightIndex:D5}";
+                    //string lightName = $"L_{md5}";
+                    string BaseObjectName = $"L_{md5}";
 
                     for (int i = 0; i < tabs.Count; i++)
                     {
                         try
                         {
-                            RedHaloLight redhaloLight = Exporter.ExportLights(tabs[i], index);
+                            RedHaloLight redhaloLight = Exporter.ExportLights(tabs[i]);
                             redhaloLight.BaseObject = BaseObjectName;
                             redhaloScene.LightsList.Add(redhaloLight);
                         }
@@ -303,7 +305,7 @@ namespace RedHaloM2B
             RedHaloTools.WriteLog($"=========导出材质开始=========");
             // 清理场景中不支持的材质
             RedHaloTools.CleanupMaterials();
-            
+
             var materials = MaterialUtils.GetSceneMaterials().ToList();
 
             var basePbrMaterialType = new HashSet<string> {
@@ -313,7 +315,7 @@ namespace RedHaloM2B
             var lightMaterialType = new HashSet<string> {
                    "VRayLightMtl", "CoronaLightMtl"
             };
-            
+
             var multiMaterialType = new HashSet<string> {
                    "VRayBlendMtl", "CoronaLayerMtl", "Blend", "VRay2SidedMtl", "VRayOverrideMtl", "CoronaRaySwitchMtl", "Double Sided"
             };
@@ -445,7 +447,8 @@ namespace RedHaloM2B
                             redhaloScene.Materials.Add(redHaloMtl);
                         }
                     }
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     RedHaloTools.WriteLog($"错误材质名 ：{material.Name}，类型：{materialType}");
                     RedHaloTools.WriteLog($"ERROR INFO:\n{ex.Message}");
@@ -453,7 +456,7 @@ namespace RedHaloM2B
             }
 
             #endregion
-            
+
             RedHaloTools.WriteLog($"=========导出材质结束=========");
 
             #region WRITE XML FILE / JSON FILE

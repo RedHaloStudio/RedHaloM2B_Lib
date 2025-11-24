@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Xml.Serialization;
 
 namespace RedHaloM2B.Nodes
 {

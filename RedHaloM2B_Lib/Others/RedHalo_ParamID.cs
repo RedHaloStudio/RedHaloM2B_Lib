@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RedHaloM2B.Utils
+﻿namespace RedHaloM2B.Utils
 {
     internal class RH_ParamID
     {

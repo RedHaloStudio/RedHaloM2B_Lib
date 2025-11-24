@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using ManagedServices;
 
 namespace RedHaloM2B
 {
@@ -21,7 +20,7 @@ namespace RedHaloM2B
         {
             if (File.Exists(filePath))
             {
-                string  maxScriptcmd = File.ReadAllText(filePath);
+                string maxScriptcmd = File.ReadAllText(filePath);
                 ExecuteMaxScriptCommand(maxScriptcmd);
             }
         }

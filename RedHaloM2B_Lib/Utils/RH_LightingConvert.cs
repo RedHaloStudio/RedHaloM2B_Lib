@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RedHaloM2B
+﻿namespace RedHaloM2B
 {
     internal class LightingConvert
     {

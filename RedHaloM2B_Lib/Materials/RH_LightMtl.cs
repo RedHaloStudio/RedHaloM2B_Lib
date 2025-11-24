@@ -1,5 +1,5 @@
-﻿using RedHaloM2B.Textures;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using RedHaloM2B.Textures;
 
 namespace RedHaloM2B.Materials
 {

@@ -1,14 +1,14 @@
 macroScript RedHaloM2B
 category:"REDHALO STUDIO"
-tooltip:"RedHalo Export Scene to Blender"
-buttonText:"Export To Blender"
+tooltip:"Export to Blender"
+buttonText:"Export to Blender"
 (
     -- Again a limitation in maxscript... Cannot get the actionitem from the managed assembly easily
     -- but using the IDs will allow this macroscript to execute it
     
     -- Execute the plugin; from a managed CuiCommandAdaptor implemented plugin,
     -- you can grab the unqiue ID from the MAXScript listener window.
-    actionMan.executeAction 36784 "14536"
+    actionMan.executeAction 59289 "4758"  -- REDHALO STUDIO: Export to Blender
 
     -- NOTE
     -- Doc Link: https://help.autodesk.com/view/MAXDEV/2023/ENU/?guid=GUID-38CB8317-6EB2-49D1-A086-B06BA2A141AE 

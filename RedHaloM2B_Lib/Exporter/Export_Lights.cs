@@ -1,16 +1,19 @@
 ﻿using Autodesk.Max;
 using RedHaloM2B.Nodes;
 using System;
-using System.Diagnostics;
 
 namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloLight ExportLights(IINode light, int lightIndex)
+        public static RedHaloLight ExportLights(IINode light)
         {
-            string lightName = $"light_{lightIndex:D5}";
             string lightSourName = light.Name;
+
+            string md5 = RedHaloTools.CalcMD5FromString(lightSourName);
+            //string lightName = $"light_{lightIndex:D5}";
+            string lightName = $"L_{md5}";
+           
             //string gid = Guid.NewGuid().ToString();
 
             //Set new name
@@ -82,7 +85,7 @@ namespace RedHaloM2B
                     {
                         lightPB.SetValue(lightPB.IndextoID(8), 0, 0, 0);
                     }
-                    
+
                     float lightStrength = 0f;
                     lightPB.GetValue(lightPB.IndextoID(7), 0, ref lightStrength, RedHaloCore.Forever, 0);
 

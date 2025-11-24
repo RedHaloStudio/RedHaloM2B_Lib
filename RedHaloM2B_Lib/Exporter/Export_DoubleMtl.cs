@@ -1,8 +1,5 @@
 ﻿using Autodesk.Max;
 using RedHaloM2B.Materials;
-using RedHaloM2B.Nodes;
-using RedHaloM2B.RedHaloUtils;
-using System.Diagnostics;
 
 
 namespace RedHaloM2B

@@ -30,8 +30,6 @@
     local stringMacroScriptCategory = "REDHALO STUDIO"
     if menuMan.registerMenuContext 0x38996e72 then
     (
-        -- can take these out, but it shows that it is called only when needed...
-        -- print "Creating RedHalo M2B Sub-Menu"
 
         -- this should always succeed because above
         local appStoreMenu = menuMan.findMenu stringRedHaloM2BMenu
@@ -41,10 +39,6 @@
 
         -- Add the action item as a menu entry
         appStoreMenu.addItem actionItem1 -1
-
-        -- Let's also separate each app...
-        local menuSepItem = menuMan.createSeparatorItem()
-        appStoreMenu.addItem menuSepItem -1
 
         -- redraw the menu bar with the new item
         menuMan.updateMenuBar()

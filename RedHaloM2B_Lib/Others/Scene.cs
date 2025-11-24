@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RedHaloM2B.Nodes;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 
 namespace RedHaloM2B
 {

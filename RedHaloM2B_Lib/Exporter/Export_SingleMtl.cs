@@ -174,7 +174,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-                    
+
                     #region Metallic
 
                     /*
@@ -194,7 +194,7 @@ namespace RedHaloM2B
                         PBRMtl.MetallicGroup.MetallicTexmap = MaterialUtils.ExportTexmap(texmap);
                     }
                     #endregion
-                    
+
                     #region Opacity
 
                     PBRMtl.OpacityGroup.Opacity = RedHaloTools.GetValueByID<float>(material, 3, 40) / 100.0f;
@@ -206,7 +206,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-                    
+
                     #region Subsurface
 
                     if (sss_on == 6)
@@ -242,7 +242,7 @@ namespace RedHaloM2B
                         }
                     }
                     #endregion
-                    
+
                     #region Anisotropic
                     PBRMtl.AnisotropicGroup.Anisotropic = RedHaloTools.GetValueByID<float>(material, 1, 1);
                     PBRMtl.AnisotropicGroup.AnisotropicRotation = (float)(RedHaloTools.GetValueByID<float>(material, 1, 2) % 360 / 360);
@@ -324,7 +324,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-                    
+
                     #region Sheen
                     maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 52);
 
@@ -346,7 +346,7 @@ namespace RedHaloM2B
                         texmap = null;
                     }
                     #endregion
-                    
+
                     #region Emission
 
                     maxClr = RedHaloTools.GetValueByID<IColor>(material, 0, 5);
@@ -428,7 +428,7 @@ namespace RedHaloM2B
                     }
 
                     #endregion
-                    
+
                     #region TranslucentColor
 
                     #endregion
@@ -514,7 +514,7 @@ namespace RedHaloM2B
 
                     // Roughness Texmap
                     texmap = RedHaloTools.GetValueByID<ITexmap>(material, 0, 14);
-                    if(texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 33) == 1)
+                    if (texmap != null && RedHaloTools.GetValueByID<int>(material, 0, 33) == 1)
                     {
                         PBRMtl.ReflectionGroup.RoughnessTexmap = MaterialUtils.ExportTexmap(texmap);
                     }

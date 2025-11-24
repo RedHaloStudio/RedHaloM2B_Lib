@@ -1,13 +1,12 @@
 ﻿using Autodesk.Max;
 using RedHaloM2B.Nodes;
 using System;
-using System.Diagnostics;
 
 namespace RedHaloM2B
 {
     partial class Exporter
     {
-        public static RedHaloCamera ExportCamera(IINode camera, int cameraIndex)
+        public static RedHaloCamera ExportCamera(IINode camera)
         {
             // 缓存一些常量，避免重复读取
             var foreverTime = RedHaloCore.Forever;
@@ -25,7 +24,9 @@ namespace RedHaloM2B
 
             // 相机名称设置
             string cameraSourceName = camera.Name;
-            string cameraName = $"camera_{cameraIndex:D5}";
+            string md5 = RedHaloTools.CalcMD5FromString(cameraSourceName);
+            //string cameraName = $"camera_{cameraIndex:D5}";
+            string cameraName = $"C_{md5}";
             camera.Name = cameraName;
 
             // 创建 Max 相机和相机状态对象
@@ -45,7 +46,7 @@ namespace RedHaloM2B
                     paramBlock = maxCamera?.SubAnim(0) as IIParamBlock2;
                     return paramBlock != null;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -131,11 +132,11 @@ namespace RedHaloM2B
 
                         //SensorWidth
                         camParamBlock.GetValue(camParamBlock.IndextoID(23), 0, ref cSensorWidth, RedHaloCore.Forever, 0);
-                        redHaloCamera.SensorWidth = cSensorWidth;                        
+                        redHaloCamera.SensorWidth = cSensorWidth;
 
                         // Camera Clipping
                         camParamBlock.GetValue(camParamBlock.IndextoID(4), 0, ref cEnabledClipping, RedHaloCore.Forever, 0);
-                        if(cEnabledClipping != 0)
+                        if (cEnabledClipping != 0)
                         {
                             //Clip Min
                             camParamBlock.GetValue(camParamBlock.IndextoID(5), 0, ref cClippingNear, RedHaloCore.Forever, 0);
@@ -144,7 +145,7 @@ namespace RedHaloM2B
                             //Clip Max
                             camParamBlock.GetValue(camParamBlock.IndextoID(6), 0, ref cClippingFar, RedHaloCore.Forever, 0);
                             redHaloCamera.ClippingFar = cClippingFar;
-                        }                        
+                        }
 
                         //Shift X
                         camParamBlock.GetValue(camParamBlock.IndextoID(75), 0, ref cShiftX, RedHaloCore.Forever, 0);

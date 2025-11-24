@@ -10,8 +10,7 @@ namespace RedHaloM2B
     public class RedHaloMenuStrings
     {
         public static string menuCategory = "REDHALO STUDIO";
-        public static string menuActionName = "Export to Blender...";
-        public static string menuName = "REDHALO";
+        public static string menuActionName = "Export to Blender";
     }
 
     public abstract class RedHalo_CuiActionCommandAdapter : CuiActionCommandAdapter
@@ -26,7 +25,10 @@ namespace RedHaloM2B
             get { return InternalCategory; }
         }
 
-        public override string InternalActionText => RedHaloMenuStrings.menuActionName;
+        public override string InternalActionText
+        {
+            get { return CustomActionText; }
+        }
 
         public override string InternalCategory => RedHaloMenuStrings.menuCategory;
 
@@ -50,24 +52,26 @@ namespace RedHaloM2B
     /// </summary>
     public class AdnCui_ExplodeGeometry : RedHalo_CuiActionCommandAdapter
     {
-        public override string CustomActionText
-        {
-            get { return "RedHalo Export Scene"; }
-        }
+        public Window dialog = null;
+        public override string CustomActionText => RedHaloMenuStrings.menuActionName;
 
         public override void CustomExecute(object parameter)
         {
             try
             {
-                var dialog = new Window();
-                dialog.Title = "RedHalo M2B";
+                if (dialog != null)
+                {
+                    dialog.Close();
+                    dialog = null;
+                }
+                dialog = new Window();
+                dialog.Title = $"RedHalo M2B _ Build:{DateTime.Now.ToString("yyMMddHHmm")}";
                 dialog.SizeToContent = SizeToContent.Manual;
                 dialog.Width = 300;
-                dialog.Height = 350;
-                dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                dialog.Height = 300;
+                dialog.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 dialog.ShowInTaskbar = false;
                 dialog.ResizeMode = ResizeMode.NoResize;
-                dialog.Topmost = true;
 
                 RedHaloUI redHaloUI = new RedHaloUI(dialog);
                 dialog.Content = redHaloUI;
@@ -78,7 +82,6 @@ namespace RedHaloM2B
 
                 dialog.Show(); //modal version; this prevents changes being made to model while our dialog is running, etc.
                 //dialog.ShowDialog(); //窗口前置，阻塞后续代码执行
-
             }
             catch (Exception ex)
             {

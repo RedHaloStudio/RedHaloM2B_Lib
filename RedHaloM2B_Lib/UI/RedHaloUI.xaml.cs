@@ -1,19 +1,7 @@
 ﻿using Autodesk.Max;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RedHaloM2B.UI
 {
@@ -57,7 +45,7 @@ namespace RedHaloM2B.UI
             // 检测有没有安装USD插件，如果没有安装，就禁用USD选项
             export_mode_fast.IsEnabled = isUSDPluginInstalled;
             export_mode_slow.IsChecked = !isUSDPluginInstalled;
-            
+
         }
 
         public bool isUSDPluginInstalled
@@ -70,7 +58,7 @@ namespace RedHaloM2B.UI
 
         public bool exportMode
         {
-            get 
+            get
             {
                 return ((bool)export_mode_fast.IsChecked);
             }
@@ -78,14 +66,19 @@ namespace RedHaloM2B.UI
 
         public bool isSelected
         {
-            get 
-            { 
-                return (bool)export_selected.IsChecked; 
+            get
+            {
+                return (bool)export_selected.IsChecked;
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
+            // 设置按钮为处理状态
+            export_btn_title.Visibility = Visibility.Hidden;
+            export_btn_processing.Visibility = Visibility.Visible;
+            this.IsEnabled = false;
+
             string exportFileFormat = "USD";
 
             if (!exportMode)
@@ -95,10 +88,15 @@ namespace RedHaloM2B.UI
 
             bool export_selected = isSelected;
             bool explodeGroup = false;
-            bool scaleScene = true;
             bool convertToPoly = false;
+            int result = 0;
+            result = ExportScene.SceneExporter(exportFileFormat, explodeGroup, convertToPoly);
 
-            int result = ExportScene.SceneExporter(exportFileFormat, explodeGroup, convertToPoly);
+            // 恢复按钮状态
+            export_btn_title.Visibility = Visibility.Visible;
+            export_btn_processing.Visibility = Visibility.Hidden;
+            this.IsEnabled = true;
+
             if (result == 0)
             {
                 MessageBox.Show($"Export Success", "RedHalo Studio", MessageBoxButton.OK, MessageBoxImage.Information);

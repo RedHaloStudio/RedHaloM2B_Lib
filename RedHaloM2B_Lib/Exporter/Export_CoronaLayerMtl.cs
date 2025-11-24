@@ -24,8 +24,8 @@ namespace RedHaloM2B
 
                 Layers = [],
             };
-            
-            IColor color = RedHaloCore.Global.Color.Create(0.5, 0.5, 0.5);            
+
+            IColor color = RedHaloCore.Global.Color.Create(0.5, 0.5, 0.5);
             IMtl baseMtl = null;
 
             baseMtl = RedHaloTools.GetValueByID<IMtl>(inMaterial, 0, 0);

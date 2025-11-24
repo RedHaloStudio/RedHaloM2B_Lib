@@ -1,5 +1,4 @@
-﻿using Autodesk.Max;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using RedHaloM2B.Textures;
 
 namespace RedHaloM2B.Materials
@@ -24,7 +23,7 @@ namespace RedHaloM2B.Materials
         public RedHaloLayer()
         {
             MaterialBlend = 1f;
-            Color = [1f, 1f, 1f]; 
+            Color = [1f, 1f, 1f];
 
             MaskAmount = 1f;
         }

@@ -1,7 +1,6 @@
 ﻿using Autodesk.Max;
 using Autodesk.Max.MaxSDK.Util;
 using Newtonsoft.Json;
-using RedHaloM2B.RedHaloUtils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,9 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace RedHaloM2B
 {
@@ -118,7 +115,7 @@ namespace RedHaloM2B
             if (File.Exists(path))
             {
                 using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {                    
+                {
                     var md5 = MD5.Create();
                     byte[] buffer = new byte[bufferSize];
                     int bytesRead;
@@ -955,15 +952,15 @@ namespace RedHaloM2B
             {
                 case "Bitmap":
                     // 处理 Bitmap 类型的纹理
-                    effectiveTexmap = currentTexmap;  
+                    effectiveTexmap = currentTexmap;
                     var bitmap = GetValueByID<IPBBitmap>(currentTexmap, 0, 13); // 获取位图纹理
 
                     //var newBitmap = RenderAndCropImage(bitmap, 0.25f, 0.25f, 0.5f, 0.5f); // 裁剪位图，参数可以根据需要调整
-                    
+
                     //if (newBitmap == null)
                     //{
-                        //Debug.Print("Failed to create new bitmap texture.");
-                        //return currentTexmap; // 如果新位图创建失败，返回当前纹理
+                    //Debug.Print("Failed to create new bitmap texture.");
+                    //return currentTexmap; // 如果新位图创建失败，返回当前纹理
                     //}
 
                     // 计算文件的Hash值，用于比较场景中的纹理是否相同
@@ -973,19 +970,19 @@ namespace RedHaloM2B
                     //textureHash.Contain(fileHash)
 
                     break;
-                
+
                 case "VRayBitmap":
                     // 处理 Bitmap 类型的纹理
                     effectiveTexmap = currentTexmap;
 
                     break;
-                
+
                 case "CoronaBitmap":
                     // 处理 Bitmap 类型的纹理
                     effectiveTexmap = currentTexmap;
-                    
+
                     break;
-                
+
                 case "Map Output Selector": // Advanced Wood Textures
                 case "BlendedBoxMap":
                 case "Camera_Map_Per_Pixel":
@@ -1018,7 +1015,7 @@ namespace RedHaloM2B
                 case "MultiTile":
                 case "RGB Multiply":
                 case "Tiles": //Brick Textures
-                
+
                 case "VRayBump2Normal":
                 case "VRayColor":
                 case "VRayColor2Bump":
@@ -1027,7 +1024,7 @@ namespace RedHaloM2B
                 case "VRayNormalMap":
 
                 case "CoronaAO":
-                case "CoronaBumpConverter":                
+                case "CoronaBumpConverter":
                 case "CoronaColorCorrect":
                 case "CoronaFrontBack":
                 case "CoronaMix":
@@ -1059,7 +1056,7 @@ namespace RedHaloM2B
                 case "VRaySky":
                     break;
 
-                case "CoronaSelect":                    
+                case "CoronaSelect":
                     var selectIndex = GetValueByID<int>(currentTexmap, 0, 2);
                     var pb = currentTexmap.GetParamBlock(0);
                     tempTexmap = pb.GetTexmap(pb.IndextoID(1), 0, RedHaloCore.Forever, selectIndex);
@@ -1137,15 +1134,15 @@ namespace RedHaloM2B
             )";
 
             IFPValue result = RedHaloCore.Global.FPValue.Create();
-            RedHaloCore.Global.ExecuteMAXScriptScript(script, Autodesk.Max.MAXScript.ScriptSource.Embedded, true, result, true);            
+            RedHaloCore.Global.ExecuteMAXScriptScript(script, Autodesk.Max.MAXScript.ScriptSource.Embedded, true, result, true);
 
-            Dictionary<string , string> fileSteamHash = new Dictionary<string, string>();
+            Dictionary<string, string> fileSteamHash = new Dictionary<string, string>();
 
             for (int i = 0; i < result.STab.Count; i++)
             {
                 // 计算文件流的哈希值
                 var fileHash = CalcMD5FromFile(result.STab[i]);
-                
+
                 // 添加到字典中
                 if (fileSteamHash.ContainsKey(fileHash))
                 {

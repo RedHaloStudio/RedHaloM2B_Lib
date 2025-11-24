@@ -86,53 +86,53 @@
     <Compile Include="Exporter\Export_Light_Material.cs" />
     <Compile Include="Exporter\Export_SingleMtl.cs" />
     <Compile Include="Exporter\Export_Scene.cs" />
-    <Compile Include="Log\RedHalo_Log.cs" />
+    <Compile Include="Log\RH_Log.cs" />
     <Compile Include="Others\Productor.cs" />
     <Compile Include="Others\RedHalo_ParamID.cs" />
     <Compile Include="Others\Scene.cs" />
     <Compile Include="Others\ProgramSettings.cs" />
     <Compile Include="Others\SceneSettings.cs" />
-    <Compile Include="Materials\RedHalo_BaseMtl.cs" />
-    <Compile Include="Materials\RedHalo_Layer.cs" />
-    <Compile Include="Materials\RedHalo_DoubleMtl.cs" />
-    <Compile Include="Materials\RedHalo_Materials.cs" />
-    <Compile Include="Materials\RedHalo_PBRMtl.cs" />
-    <Compile Include="Materials\RedHalo_MutliMtl.cs" />
-    <Compile Include="Materials\RedHalo_LightMtl.cs" />
-    <Compile Include="Materials\RedHalo_BlendMtl.cs" />
-    <Compile Include="Materials\RedHalo_OverrideMtl.cs" />
-    <Compile Include="Nodes\RedHalo_BaseNode.cs" />
-    <Compile Include="Nodes\RedHalo_Camera.cs" />
-    <Compile Include="Nodes\RedHalo_Light.cs" />
-    <Compile Include="Nodes\RedHalo_Geomerty.cs" />
+    <Compile Include="Materials\RH_BaseMtl.cs" />
+    <Compile Include="Materials\RH_Layer.cs" />
+    <Compile Include="Materials\RH_DoubleMtl.cs" />
+    <Compile Include="Materials\RH_Materials.cs" />
+    <Compile Include="Materials\RH_PBRMtl.cs" />
+    <Compile Include="Materials\RH_MutliMtl.cs" />
+    <Compile Include="Materials\RH_LightMtl.cs" />
+    <Compile Include="Materials\RH_BlendMtl.cs" />
+    <Compile Include="Materials\RH_OverrideMtl.cs" />
+    <Compile Include="Nodes\RH_BaseNode.cs" />
+    <Compile Include="Nodes\RH_Camera.cs" />
+    <Compile Include="Nodes\RH_Light.cs" />
+    <Compile Include="Nodes\RH_Geomerty.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="RedHaloCore.cs" />
+    <Compile Include="RH_Core.cs" />
     <Compile Include="settings.cs" />
-    <Compile Include="RedHaloTools.cs" />
+    <Compile Include="RH_Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RedHalo_Export.cs" />
-    <Compile Include="Textures\RedHalo_BaseTex.cs" />
-    <Compile Include="Textures\RedHalo_BitmapTex.cs" />
-    <Compile Include="Textures\RedHalo_TilesTex.cs" />
-    <Compile Include="Textures\RedHalo_CheckerTex.cs" />
-    <Compile Include="Textures\RedHalo_ColorTex.cs" />
-    <Compile Include="Textures\RedHalo_MixTex.cs" />
-    <Compile Include="Textures\RedHalo_TextureInfo.cs" />
+    <Compile Include="RH_Export.cs" />
+    <Compile Include="Textures\RH_BaseTex.cs" />
+    <Compile Include="Textures\RH_BitmapTex.cs" />
+    <Compile Include="Textures\RH_TilesTex.cs" />
+    <Compile Include="Textures\RH_CheckerTex.cs" />
+    <Compile Include="Textures\RH_ColorTex.cs" />
+    <Compile Include="Textures\RH_MixTex.cs" />
+    <Compile Include="Textures\RH_TextureInfo.cs" />
     <Compile Include="UI\RedHaloUI.xaml.cs">
       <DependentUpon>RedHaloUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\BitmapTypes.cs" />
     <Compile Include="Utils\CropParameters.cs" />
-    <Compile Include="Utils\Loader.cs" />
-    <Compile Include="Utils\RedHalo_ClassID.cs" />
-    <Compile Include="Utils\RedHalo_LightingConvert.cs" />
-    <Compile Include="Utils\RedHalo_MaterialUtils.cs" />
-    <Compile Include="Utils\RedHalo_MathUtils.cs" />
-    <Compile Include="Utils\RedHalo_ScriptsUtilities.cs" />
+    <Compile Include="Utils\RH_Loader.cs" />
+    <Compile Include="Utils\RH_ClassID.cs" />
+    <Compile Include="Utils\RH_LightingConvert.cs" />
+    <Compile Include="Utils\RH_MaterialUtils.cs" />
+    <Compile Include="Utils\RH_MathUtils.cs" />
+    <Compile Include="Utils\RH_ScriptsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\all.png" />
@@ -152,7 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="mxs\scripts.cs" />
+    <Compile Include="mxs\RH_scripts.cs" />
     <Resource Include="Fonts\Segoe Fluent Icons.ttf" />
     <None Include="ParamBlock2\PB2.xlsx" />
     <None Include="post.bat" />
@@ -164,6 +164,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem call "$(ProjectDir)post.bat" "$(TargetDir)" "$(ConfigurationName)" 2023</PostBuildEvent>
+    <PostBuildEvent>call "$(ProjectDir)post.bat" "$(TargetDir)" "$(ConfigurationName)" 2023</PostBuildEvent>
   </PropertyGroup>
 </Project>

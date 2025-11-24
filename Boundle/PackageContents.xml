@@ -60,7 +60,7 @@
     <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2023" SeriesMax="2023" />
     <ComponentEntry AppName="RedHalo_M2B"
 					Version="1.0.0"
-					ModuleName="./Contents/bin/2023/ADNExplodeGeometry.dll"
+					ModuleName="./Contents/bin/2023/RedHaloM2B.dll"
 					AppDescription="The RedHalo_M2B managed assembly module" />
   </Components>
 

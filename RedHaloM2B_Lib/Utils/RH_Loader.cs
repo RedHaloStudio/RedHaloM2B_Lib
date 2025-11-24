@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Max;
-using Autodesk.Max.Plugins;
+﻿using Autodesk.Max;
+using System;
 
 namespace RedHaloM2B
 {
@@ -136,7 +131,6 @@ namespace RedHaloM2B
                     menuItem1.ActionItem = m_mouseAction; // uses text from ActionItem.DescriptionText
                     redHaloMainMenu.AddItem(menuItem1, -1);
                 }
-                // }
 
                 IIMenuItem redHaloMenu = RedHaloCore.Global.IMenuItem;
                 redHaloMenu.Title = menuName;

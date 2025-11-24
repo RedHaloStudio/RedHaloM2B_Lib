@@ -97,7 +97,6 @@
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter Property="Background" Value="#4772b3" />
                                 <Setter Property="Foreground" Value="White" />
-
                             </Trigger>
 
                             <Trigger Property="IsMouseOver" Value="True">
@@ -113,6 +112,51 @@
             </Setter>
         </Style>
 
+        <Style x:Key="RH_Button_Export" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#FF313131" />
+            <Setter Property="BorderBrush" Value="#4772b3" />
+            <Setter Property="Foreground" Value="#4772b3" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Width" Value="160" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid
+                            x:Name="grid"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            ClipToBounds="True">
+                            <Rectangle
+                                x:Name="ButtonStock"
+                                Fill="{TemplateBinding Background}"
+                                RadiusX="5"
+                                RadiusY="5"
+                                Stroke="{TemplateBinding BorderBrush}"
+                                StrokeThickness="{TemplateBinding BorderThickness}" />
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Grid>
+                        <!--  触发器：鼠标悬停  -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="grid" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid x:Name="RedHaloUILayout">
         <Grid.RowDefinitions>
@@ -170,6 +214,7 @@
                 </RadioButton>
             </StackPanel>
         </StackPanel>
+        
         <StackPanel
             Grid.Row="2"
             Margin="5,0"
@@ -208,27 +253,48 @@
                 </RadioButton>
             </StackPanel>
         </StackPanel>
+
         <StackPanel
             Grid.Row="3"
             Margin="10"
             VerticalAlignment="Center">
             <Button
-                Width="160"
-                Height="40"
+                Width="260"
+                Height="45"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="#FF313131"
                 Click="Button_Click"
                 FontWeight="Bold"
-                Foreground="#4772b3">
-                <StackPanel Orientation="Horizontal">
-                    <Image
-                        Width="20"
-                        Margin="10,0"
-                        Source="/RedHaloM2B;component/images/export.png" />
-                    <TextBlock x:Name="export_btn" VerticalAlignment="Center">EXPORT SCENE</TextBlock>
-                </StackPanel>
+                Background="#4772b3"
+                Foreground="White"
+                Style="{StaticResource RH_Button_Export}">
+                <Grid>
+                    <StackPanel Orientation="Horizontal"
+                                x:Name="export_btn_title" Margin="5"
+                                Width="140"
+                                Visibility="Visible"
+                                >
+                        <Image
+                            Width="20"
+                            Margin="10,0"
+                            Source="/RedHaloM2B;component/images/export.png" />
+                        <TextBlock VerticalAlignment="Center">EXPORT SCENE</TextBlock>
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Visibility="Hidden"
+                        x:Name="export_btn_processing"
+                        >
+                        <ProgressBar
+                            x:Name="export_progress"
+                            Width="260"
+                            Height="48"
+                            IsIndeterminate="True"
+                            Foreground="#4772b3"/>
+                    </StackPanel>
+                </Grid>
             </Button>
-        </StackPanel>
+        </StackPanel>    
     </Grid>
 </UserControl>
